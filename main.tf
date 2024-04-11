@@ -2,6 +2,7 @@
 resource "azurerm_resource_group" "TODO" {
   location = var.location
   name     = var.name # calling code must supply the name
+  tags     = var.tags
 }
 
 # required AVM resources interfaces
@@ -10,7 +11,7 @@ resource "azurerm_management_lock" "this" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.lock.kind}")
-  scope      = azurerm_MY_RESOURCE.this.id
+  scope      = azurerm_resource_group.TODO
   notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
 }
 

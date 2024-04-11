@@ -19,7 +19,7 @@ locals {
         user_assigned_resource_ids = var.managed_identities.user_assigned_resource_ids
       }
     } : {}
-}
+  }
 
   # Private endpoint application security group associations.
   # We merge the nested maps from private endpoints and application security group associations into a single map.
