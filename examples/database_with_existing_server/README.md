@@ -5,15 +5,15 @@ This illustrates how to use an existing SQL Server (i.e. an existing `azurerm_ms
 
 ```hcl
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = "~> 1.6"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 3.108"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.5.1"
+      version = "~> 3.6"
     }
   }
 }
@@ -40,14 +40,14 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "AustraliaEast"
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "random_password" "admin_password" {
   length           = 16
-  special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
 }
 
 locals {
@@ -69,9 +69,9 @@ locals {
 }
 
 resource "azurerm_mssql_server" "this" {
+  location                     = azurerm_resource_group.this.location
   name                         = module.naming.sql_server.name_unique
   resource_group_name          = azurerm_resource_group.this.name
-  location                     = azurerm_resource_group.this.location
   version                      = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
@@ -87,8 +87,9 @@ module "sql_server" {
   resource_group_name          = azurerm_resource_group.this.name
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-
-  databases = local.databases
+  location                     = azurerm_resource_group.this.location
+  server_version               = "12.0"
+  databases                    = local.databases
 }
 ```
 
@@ -97,19 +98,19 @@ module "sql_server" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.108)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (3.5.1)
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.108)
 
-- <a name="provider_random"></a> [random](#provider\_random) (3.5.1)
+- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 
@@ -117,7 +118,7 @@ The following resources are used by this module:
 
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/3.5.1/docs/resources/password) (resource)
+- [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs

@@ -5,15 +5,15 @@ This deploys the SQL module using a private endpoint.
 
 ```hcl
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = "~> 1.6"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 3.108"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.5.1"
+      version = "~> 3.6"
     }
   }
 }
@@ -30,22 +30,22 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "AustraliaEast"
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "azurerm_virtual_network" "this" {
-  name                = module.naming.virtual_network.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
   address_space       = ["192.168.0.0/24"]
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.virtual_network.name_unique
+  resource_group_name = azurerm_resource_group.this.name
 }
 
 resource "azurerm_subnet" "this" {
+  address_prefixes     = ["192.168.0.0/24"]
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = ["192.168.0.0/24"]
 }
 
 resource "azurerm_private_dns_zone" "this" {
@@ -55,8 +55,8 @@ resource "azurerm_private_dns_zone" "this" {
 
 resource "random_password" "admin_password" {
   length           = 16
-  special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
 }
 
 # This is the module call
@@ -70,7 +70,8 @@ module "sql_server" {
   administrator_login           = "mysqladmin"
   administrator_login_password  = random_password.admin_password.result
   public_network_access_enabled = false
-
+  location                      = azurerm_resource_group.this.location
+  server_version                = "12.0"
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
@@ -85,19 +86,19 @@ module "sql_server" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.108)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (3.5.1)
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.108)
 
-- <a name="provider_random"></a> [random](#provider\_random) (3.5.1)
+- <a name="provider_random"></a> [random](#provider\_random) (~> 3.6)
 
 ## Resources
 
@@ -107,7 +108,7 @@ The following resources are used by this module:
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
-- [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/3.5.1/docs/resources/password) (resource)
+- [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
