@@ -19,3 +19,8 @@ output "resource_elasticpools" {
   description = "A map of elastic pools. The map key is the supplied input to var.elastic_pools. The map value is the entire azurerm_mssql_elasticpool resource."
   value       = azurerm_mssql_elasticpool.this
 }
+
+output "resource_id" {
+  description = "This is the full output for the resource."
+  value       = try(azurerm_mssql_server.this[0].id, data.azurerm_mssql_server.this[0].id)
+}
