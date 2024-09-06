@@ -44,6 +44,41 @@ resource "random_password" "admin_password" {
   special          = true
 }
 
+locals {
+  databases = {
+    sample_database = {
+      create_mode     = "Default"
+      collation       = "SQL_Latin1_General_CP1_CI_AS"
+      elastic_pool_id = module.sql_server.resource_elasticpools["sample_pool"].id
+      license_type    = "LicenseIncluded"
+      max_size_gb     = 50
+      sku_name        = "ElasticPool"
+
+      short_term_retention_policy = {
+        retention_days           = 1
+        backup_interval_in_hours = 24
+      }
+    }
+  }
+  elastic_pools = {
+    sample_pool = {
+      sku = {
+        name     = "StandardPool"
+        capacity = 50
+        tier     = "Standard"
+      }
+      per_database_settings = {
+        min_capacity = 50
+        max_capacity = 50
+      }
+      maintenance_configuration_name = "SQL_Default"
+      zone_redundant                 = false
+      license_type                   = "LicenseIncluded"
+      max_size_gb                    = 50
+    }
+  }
+}
+
 # This is the module call
 module "sql_server" {
   source = "../../"
@@ -54,4 +89,7 @@ module "sql_server" {
   resource_group_name          = azurerm_resource_group.this.name
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
+
+  databases     = local.databases
+  elastic_pools = local.elastic_pools
 }

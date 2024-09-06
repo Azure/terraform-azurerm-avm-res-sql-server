@@ -51,15 +51,30 @@ resource "random_password" "admin_password" {
 }
 
 # This is the module call
-module "sql_server" {
+module "sql_server_with_firewall" {
   source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  enable_telemetry             = var.enable_telemetry
-  name                         = module.naming.sql_server.name_unique
-  resource_group_name          = azurerm_resource_group.this.name
-  administrator_login          = "mysqladmin"
-  administrator_login_password = random_password.admin_password.result
+  enable_telemetry              = var.enable_telemetry
+  name                          = module.naming.sql_server.name_unique
+  resource_group_name           = azurerm_resource_group.this.name
+  administrator_login           = "mssqladmin"
+  administrator_login_password  = random_password.admin_password.result
+  public_network_access_enabled = true
+  firewall_rules = {
+    single_ip = {
+      start_ip_address = "40.112.8.12"
+      end_ip_address   = "40.112.8.12"
+    }
+    ip_range = {
+      start_ip_address = "40.112.0.0"
+      end_ip_address   = "40.112.255.255"
+    }
+    access_azure = {
+      start_ip_address = "0.0.0.0"
+      end_ip_address   = "0.0.0.0"
+    }
+  }
 }
 ```
 
@@ -122,7 +137,7 @@ Source: Azure/naming/azurerm
 
 Version: 0.3.0
 
-### <a name="module_sql_server"></a> [sql\_server](#module\_sql\_server)
+### <a name="module_sql_server_with_firewall"></a> [sql\_server\_with\_firewall](#module\_sql\_server\_with\_firewall)
 
 Source: ../../
 

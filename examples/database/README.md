@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# SQL Server and Database
 
-This deploys the module in its simplest form.
+This illustrates how to deploy a SQL Server with a database.
 
 ```hcl
 terraform {
@@ -50,6 +50,38 @@ resource "random_password" "admin_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+locals {
+  tags = {
+    environment = "sample"
+    cost_centre = "demo"
+  }
+
+  databases = {
+    my_sample_db = {
+      create_mode  = "Default"
+      collation    = "SQL_Latin1_General_CP1_CI_AS"
+      server_id    = module.sql_server.resource.id
+      license_type = "LicenseIncluded"
+      max_size_gb  = 50
+      sku_name     = "S0"
+
+      short_term_retention_policy = {
+        retention_days           = 1
+        backup_interval_in_hours = 24
+      }
+
+      long_term_retention_policy = {
+        weekly_retention  = "P2W1D"
+        monthly_retention = "P2M"
+        yearly_retention  = "P1Y"
+        week_of_year      = 1
+      }
+
+      tags = local.tags
+    }
+  }
+}
+
 # This is the module call
 module "sql_server" {
   source = "../../"
@@ -60,6 +92,10 @@ module "sql_server" {
   resource_group_name          = azurerm_resource_group.this.name
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
+
+  databases = local.databases
+
+  tags = local.tags
 }
 ```
 

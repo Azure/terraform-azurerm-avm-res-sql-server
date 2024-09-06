@@ -1,22 +1,10 @@
 <!-- BEGIN_TF_DOCS -->
-# terraform-azurerm-avm-template
+# terraform-azurerm-avm-sql-server
 
-This is a template repo for Terraform Azure Verified Modules.
+This is a resource module repo for SQL Server on Azure.
 
-Things to do:
-
-1. Set up a GitHub repo environment called `test`.
-1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
-1. Create a user-assigned managed identity in your test subscription.
-1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
-1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
-1. Create the following environment secrets on the `test` environment:
-   1. AZURE\_CLIENT\_ID
-   1. AZURE\_TENANT\_ID
-   1. AZURE\_SUBSCRIPTION\_ID
-1. Search and update TODOs within the code and remove the TODO comments once complete.
-
-Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
+> [!WARNING]
+> Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -27,37 +15,43 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0)
 
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+
 - <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.71.0)
-
-- <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0)
 
 ## Resources
 
 The following resources are used by this module:
 
-- [azurerm_TODO_the_resource_for_this_module.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/TODO_the_resource_for_this_module) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) (resource)
+- [azurerm_mssql_elasticpool.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_elasticpool) (resource)
+- [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
+- [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
+- [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
+- [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/mssql_server) (data source)
 - [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
+- [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
 The following input variables are required:
 
-### <a name="input_name"></a> [name](#input\_name)
+### <a name="input_administrator_login"></a> [administrator\_login](#input\_administrator\_login)
 
-Description: The name of the this resource.
+Description: n/a
+
+Type: `string`
+
+### <a name="input_administrator_login_password"></a> [administrator\_login\_password](#input\_administrator\_login\_password)
+
+Description: n/a
 
 Type: `string`
 
@@ -71,19 +65,94 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
-### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
+### <a name="input_azuread_administrator"></a> [azuread\_administrator](#input\_azuread\_administrator)
 
-Description: Customer managed keys that should be associated with the resource.
+Description: Azure AD Administrator Configuration
 
 Type:
 
 ```hcl
 object({
-    key_vault_resource_id              = optional(string)
-    key_name                           = optional(string)
-    key_version                        = optional(string, null)
-    user_assigned_identity_resource_id = optional(string, null)
+    login_username              = optional(string, null)
+    object_id                   = optional(string, null)
+    tenant_id                   = optional(string)
+    azuread_authentication_only = optional(bool)
   })
+```
+
+Default: `null`
+
+### <a name="input_connection_policy"></a> [connection\_policy](#input\_connection\_policy)
+
+Description: n/a
+
+Type: `string`
+
+Default: `"Default"`
+
+### <a name="input_databases"></a> [databases](#input\_databases)
+
+Description: Map of databases.
+
+Type:
+
+```hcl
+map(object({
+    auto_pause_delay_in_minutes         = optional(number)
+    create_mode                         = optional(string, "Default")
+    collation                           = optional(string)
+    elastic_pool_id                     = optional(string)
+    geo_backup_enabled                  = optional(bool, true)
+    maintenance_configuration_name      = optional(string)
+    ledger_enabled                      = optional(bool, false)
+    license_type                        = optional(string)
+    max_size_gb                         = optional(number)
+    min_capacity                        = optional(number)
+    restore_point_in_time               = optional(string)
+    recover_database_id                 = optional(string)
+    restore_dropped_database_id         = optional(string)
+    read_replica_count                  = optional(number)
+    read_scale                          = optional(bool)
+    sample_name                         = optional(string)
+    sku_name                            = optional(string)
+    storage_account_type                = optional(string, "Geo")
+    transparent_data_encryption_enabled = optional(bool, true)
+    zone_redundant                      = optional(bool)
+
+    import = optional(object({
+      storage_uri            = string
+      storage_key            = string
+      storage_key_type       = string
+      administrator_login    = string
+      administrator_password = string
+      authentication_type    = string
+      storage_account_id     = optional(string)
+    }))
+
+    long_term_retention_policy = optional(object({
+      weekly_retention  = string
+      monthly_retention = string
+      yearly_retention  = string
+      week_of_year      = number
+    }))
+
+    short_term_retention_policy = object({
+      retention_days           = number
+      backup_interval_in_hours = optional(number, 12)
+    })
+
+    threat_detection_policy = optional(object({
+      state                      = optional(string, "Disabled")
+      disabled_alerts            = optional(list(string))
+      email_account_admins       = optional(string, "Disabled")
+      email_addresses            = optional(list(string))
+      retention_days             = optional(number)
+      storage_account_access_key = optional(string)
+      storage_endpoint           = optional(string)
+    }))
+
+    tags = optional(map(string))
+  }))
 ```
 
 Default: `{}`
@@ -122,6 +191,33 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_elastic_pools"></a> [elastic\_pools](#input\_elastic\_pools)
+
+Description: Map of elastic pools configurations.
+
+Type:
+
+```hcl
+map(object({
+    sku = object({
+      name     = string
+      capacity = number
+      tier     = string
+      family   = optional(string)
+    })
+    per_database_settings = object({
+      min_capacity = number
+      max_capacity = number
+    })
+    maintenance_configuration_name = optional(string, "SQL_Default")
+    zone_redundant                 = optional(bool, "true")
+    license_type                   = optional(string)
+    max_size_gb                    = optional(number)
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
@@ -130,7 +226,50 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
+
+### <a name="input_existing_parent_resource"></a> [existing\_parent\_resource](#input\_existing\_parent\_resource)
+
+Description: If supplied, this SQL Server will be used by parent resources, instead of creating a new SQL Server
+
+Type:
+
+```hcl
+object({
+    name = string
+  })
+```
+
+Default: `null`
+
+### <a name="input_firewall_rules"></a> [firewall\_rules](#input\_firewall\_rules)
+
+Description: - `end_ip_address` - (Required) Specifies the End IP Address associated with this Firewall Rule.
+- `start_ip_address` - (Required) Specifies the Start IP Address associated with this Firewall Rule.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the MySQL Firewall Rule.
+- `delete` - (Defaults to 30 minutes) Used when deleting the MySQL Firewall Rule.
+- `read` - (Defaults to 5 minutes) Used when retrieving the MySQL Firewall Rule.
+- `update` - (Defaults to 30 minutes) Used when updating the MySQL Firewall Rule.
+
+Type:
+
+```hcl
+map(object({
+    end_ip_address   = string
+    start_ip_address = string
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_location"></a> [location](#input\_location)
 
@@ -157,7 +296,7 @@ Default: `{}`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
-Description: Managed identities to be created for the resource.
+Description: n/a
 
 Type:
 
@@ -169,6 +308,30 @@ object({
 ```
 
 Default: `{}`
+
+### <a name="input_name"></a> [name](#input\_name)
+
+Description: The name of the this resource.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_outbound_network_restriction_enabled"></a> [outbound\_network\_restriction\_enabled](#input\_outbound\_network\_restriction\_enabled)
+
+Description: n/a
+
+Type: `string`
+
+Default: `true`
+
+### <a name="input_primary_user_assigned_identity_id"></a> [primary\_user\_assigned\_identity\_id](#input\_primary\_user\_assigned\_identity\_id)
+
+Description: n/a
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
@@ -226,6 +389,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
+
+Description: n/a
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
 Description: A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -255,13 +426,29 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_server_version"></a> [server\_version](#input\_server\_version)
+
+Description: The version for the server. Valid values are: 2.0 (for v11 server) and 12.0 (for v12 server). Changing this forces a new resource to be created.
+
+Type: `string`
+
+Default: `"12.0"`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
-Description: The map of tags to be applied to the resource
+Description: n/a
 
 Type: `map(any)`
 
 Default: `{}`
+
+### <a name="input_transparent_data_encryption_key_vault_key_id"></a> [transparent\_data\_encryption\_key\_vault\_key\_id](#input\_transparent\_data\_encryption\_key\_vault\_key\_id)
+
+Description: n/a
+
+Type: `string`
+
+Default: `null`
 
 ## Outputs
 
@@ -274,6 +461,14 @@ Description: A map of private endpoints. The map key is the supplied input to va
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: This is the full output for the resource.
+
+### <a name="output_resource_databases"></a> [resource\_databases](#output\_resource\_databases)
+
+Description: A map of databases. The map key is the supplied input to var.databases. The map value is the entire azurerm\_mssql\_database resource.
+
+### <a name="output_resource_elasticpools"></a> [resource\_elasticpools](#output\_resource\_elasticpools)
+
+Description: A map of elastic pools. The map key is the supplied input to var.elastic\_pools. The map value is the entire azurerm\_mssql\_elasticpool resource.
 
 ## Modules
 
