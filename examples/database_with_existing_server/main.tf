@@ -81,6 +81,7 @@ module "sql_server" {
   resource_group_name          = azurerm_resource_group.this.name
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-
+  location       = azurerm_resource_group.this.location
+  server_version = "12.0"
   databases = local.databases
 }

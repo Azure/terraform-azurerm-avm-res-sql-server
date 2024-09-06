@@ -64,7 +64,7 @@ module "sql_server" {
   administrator_login           = "mysqladmin"
   administrator_login_password  = random_password.admin_password.result
   public_network_access_enabled = false
-  location                      = azurerm_resource_group.location
+  location                      = azurerm_resource_group.this.location
   server_version                = "12.0"
   private_endpoints = {
     primary = {

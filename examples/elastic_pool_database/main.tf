@@ -92,6 +92,6 @@ module "sql_server" {
 
   databases      = local.databases
   elastic_pools  = local.elastic_pools
-  location       = azurerm_resource_group.location
+  location       = azurerm_resource_group.this.location
   server_version = "12.0"
 }
