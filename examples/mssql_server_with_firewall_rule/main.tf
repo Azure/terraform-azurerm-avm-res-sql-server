@@ -49,6 +49,8 @@ module "sql_server_with_firewall" {
   source = "../../"
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
+  location       = azurerm_resource_group.location
+  server_version = "12.0"
   enable_telemetry              = var.enable_telemetry
   name                          = module.naming.sql_server.name_unique
   resource_group_name           = azurerm_resource_group.this.name
