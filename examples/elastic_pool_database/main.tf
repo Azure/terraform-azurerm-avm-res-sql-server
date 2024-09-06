@@ -90,8 +90,8 @@ module "sql_server" {
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
 
-  databases     = local.databases
-  elastic_pools = local.elastic_pools
-  location = azurerm_resource_group.location
+  databases      = local.databases
+  elastic_pools  = local.elastic_pools
+  location       = azurerm_resource_group.location
   server_version = "12.0"
 }
