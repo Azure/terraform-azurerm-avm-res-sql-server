@@ -34,14 +34,14 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "AustraliaEast"
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "random_password" "admin_password" {
   length           = 16
-  special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
 }
 
 locals {
@@ -63,9 +63,9 @@ locals {
 }
 
 resource "azurerm_mssql_server" "this" {
+  location                     = azurerm_resource_group.this.location
   name                         = module.naming.sql_server.name_unique
   resource_group_name          = azurerm_resource_group.this.name
-  location                     = azurerm_resource_group.this.location
   version                      = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result

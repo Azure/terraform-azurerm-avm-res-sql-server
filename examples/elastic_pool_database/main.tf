@@ -34,17 +34,32 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "AustraliaEast"
+  name     = module.naming.resource_group.name_unique
 }
 
 resource "random_password" "admin_password" {
   length           = 16
-  special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
 }
 
 locals {
+  databases = {
+    sample_database = {
+      create_mode     = "Default"
+      collation       = "SQL_Latin1_General_CP1_CI_AS"
+      elastic_pool_id = module.sql_server.resource_elasticpools["sample_pool"].id
+      license_type    = "LicenseIncluded"
+      max_size_gb     = 50
+      sku_name        = "ElasticPool"
+
+      short_term_retention_policy = {
+        retention_days           = 1
+        backup_interval_in_hours = 24
+      }
+    }
+  }
   elastic_pools = {
     sample_pool = {
       sku = {
@@ -60,22 +75,6 @@ locals {
       zone_redundant                 = false
       license_type                   = "LicenseIncluded"
       max_size_gb                    = 50
-    }
-  }
-
-  databases = {
-    sample_database = {
-      create_mode     = "Default"
-      collation       = "SQL_Latin1_General_CP1_CI_AS"
-      elastic_pool_id = module.sql_server.resource_elasticpools["sample_pool"].id
-      license_type    = "LicenseIncluded"
-      max_size_gb     = 50
-      sku_name        = "ElasticPool"
-
-      short_term_retention_policy = {
-        retention_days           = 1
-        backup_interval_in_hours = 24
-      }
     }
   }
 }
