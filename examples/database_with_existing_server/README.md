@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# SQL Server and Database
 
-This deploys the module in its simplest form.
+This illustrates how to use an existing SQL Server (i.e. an existing `azurerm_mssql_server` resource) and create a database with this module.
 
 ```hcl
 terraform {
@@ -50,16 +50,45 @@ resource "random_password" "admin_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+locals {
+  databases = {
+    my_db = {
+      create_mode  = "Default"
+      collation    = "SQL_Latin1_General_CP1_CI_AS"
+      server_id    = module.sql_server.resource.id
+      license_type = "LicenseIncluded"
+      max_size_gb  = 50
+      sku_name     = "S0"
+
+      short_term_retention_policy = {
+        retention_days           = 1
+        backup_interval_in_hours = 24
+      }
+    }
+  }
+}
+
+resource "azurerm_mssql_server" "this" {
+  name                         = module.naming.sql_server.name_unique
+  resource_group_name          = azurerm_resource_group.this.name
+  location                     = azurerm_resource_group.this.location
+  version                      = "12.0"
+  administrator_login          = "mysqladmin"
+  administrator_login_password = random_password.admin_password.result
+}
+
 # This is the module call
 module "sql_server" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
+  # source             = "Azure/avm-res-sql-server/azurerm"
+
   enable_telemetry             = var.enable_telemetry
-  name                         = module.naming.sql_server.name_unique
+  existing_parent_resource     = { name = azurerm_mssql_server.this.name }
   resource_group_name          = azurerm_resource_group.this.name
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
+
+  databases = local.databases
 }
 ```
 
@@ -86,6 +115,7 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/3.5.1/docs/resources/password) (resource)
 
