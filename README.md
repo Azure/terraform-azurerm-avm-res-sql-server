@@ -426,7 +426,7 @@ Description: (Optional) Whether public network access is allowed for this server
 
 Type: `bool`
 
-Default: `null`
+Default: `false`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -498,7 +498,7 @@ Description: A map of elastic pools. The map key is the supplied input to var.el
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
-Description: This is the full output for the resource.
+Description: This is the name of the resource.
 
 ## Modules
 

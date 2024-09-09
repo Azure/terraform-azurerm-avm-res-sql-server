@@ -41,7 +41,7 @@ EOT
 
 variable "public_network_access_enabled" {
   type        = bool
-  default     = null
+  default     = false
   description = "(Optional) Whether public network access is allowed for this server. Defaults to `true`."
 }
 

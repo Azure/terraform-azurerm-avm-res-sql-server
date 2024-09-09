@@ -21,6 +21,11 @@ output "resource_elasticpools" {
 }
 
 output "resource_id" {
-  description = "This is the full output for the resource."
+  description = "This is the id of the resource."
   value       = try(azurerm_mssql_server.this[0].id, data.azurerm_mssql_server.this[0].id)
+}
+
+output "resource_id" {
+  description = "This is the name of the resource."
+  value       = try(azurerm_mssql_server.this[0].id, data.azurerm_mssql_server.this[0].name)
 }

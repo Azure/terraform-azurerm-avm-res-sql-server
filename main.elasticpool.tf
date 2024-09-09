@@ -1,7 +1,7 @@
 resource "azurerm_mssql_elasticpool" "this" {
   for_each = var.elastic_pools
 
-  location                       = coalesce(var.location, data.azurerm_resource_group.parent[0].location)
+  location                       = coalesce(var.location, data.azurerm_resource_group.parent.location)
   name                           = each.key
   resource_group_name            = var.resource_group_name
   server_name                    = try(data.azurerm_mssql_server.this[0].name, azurerm_mssql_server.this[0].name)

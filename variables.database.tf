@@ -93,7 +93,7 @@ variable "databases" {
         ], config.maintenance_configuration_name)
       )
     ])
-    error_message = "Invalid value for maintenance_configuration_name. Allowed values are SQL_Default, SQL_EastUS_DB_1, SQL_EastUS2_DB_1, ..., SQL_UAENorth_DB_2."
+    error_message = "Invalid value for maintenance_configuration_name."
   }
 
   validation {
