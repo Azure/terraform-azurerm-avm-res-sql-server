@@ -49,7 +49,7 @@ locals {
     my_sample_db = {
       create_mode  = "Default"
       collation    = "SQL_Latin1_General_CP1_CI_AS"
-      server_id    = module.sql_server.output.resource_id
+      server_id    = module.sql_server.resource.id
       license_type = "LicenseIncluded"
       max_size_gb  = 50
       sku_name     = "S0"
