@@ -2,10 +2,11 @@ variable "databases" {
   description = "Map of databases."
 
   type = map(object({
+    name                                = string
     auto_pause_delay_in_minutes         = optional(number)
     create_mode                         = optional(string, "Default")
     collation                           = optional(string)
-    elastic_pool_id                     = optional(string)
+    elastic_pool_key                    = optional(string)
     geo_backup_enabled                  = optional(bool, true)
     maintenance_configuration_name      = optional(string)
     ledger_enabled                      = optional(bool, false)
@@ -58,64 +59,5 @@ variable "databases" {
 
     tags = optional(map(string))
   }))
-
-  validation {
-    condition = can([
-      for database, config in var.databases : (
-        config.create_mode == null ? true : contains([
-          "Copy", "Default", "OnlineSecondary", "PointInTimeRestore", "Recovery", "Restore", "RestoreExternalBackup",
-          "RestoreExternalBackupSecondary", "RestoreLongTermRetentionBackup", "Secondary"
-        ], config.create_mode)
-      )
-    ])
-    error_message = "Invalid value for create_mode. Allowed values are Copy, Default, OnlineSecondary, PointInTimeRestore, Recovery, Restore, RestoreExternalBackup, RestoreExternalBackupSecondary, RestoreLongTermRetentionBackup, or Secondary."
-  }
-
-  validation {
-    condition = can([
-      for database, config in var.databases : (
-        config.maintenance_configuration_name == null ? true : contains([
-          "SQL_Default",
-          "SQL_AustraliaEast_DB_1", "SQL_AustraliaEast_DB_2", "SQL_AustraliaSoutheast_DB_1", "SQL_AustraliaSoutheast_DB_2",
-          "SQL_BrazilSoutheast_DB_1", "SQL_BrazilSoutheast_DB_2", "SQL_BrazilSouth_DB_1", "SQL_BrazilSouth_DB_2",
-          "SQL_CanadaCentral_DB_1", "SQL_CanadaCentral_DB_2", "SQL_CanadaEast_DB_1", "SQL_CanadaEast_DB_2",
-          "SQL_CentralIndia_DB_1", "SQL_CentralIndia_DB_2", "SQL_CentralUS_DB_1", "SQL_CentralUS_DB_2",
-          "SQL_EastAsia_DB_1", "SQL_EastAsia_DB_2", "SQL_EastUS_DB_1", "SQL_EastUS_DB_2", "SQL_EastUS2_DB_1", "SQL_EastUS2_DB_2",
-          "SQL_FranceCentral_DB_1", "SQL_FranceCentral_DB_2", "SQL_FranceSouth_DB_1", "SQL_FranceSouth_DB_2",
-          "SQL_GermanyWestCentral_DB_1", "SQL_GermanyWestCentral_DB_2",
-          "SQL_JapanEast_DB_1", "SQL_JapanEast_DB_2", "SQL_JapanWest_DB_1", "SQL_JapanWest_DB_2",
-          "SQL_NorthCentralUS_DB_1", "SQL_NorthCentralUS_DB_2", "SQL_NorthEurope_DB_1", "SQL_NorthEurope_DB_2",
-          "SQL_SoutheastAsia_DB_1", "SQL_SoutheastAsia_DB_2", "SQL_SouthCentralUS_DB_1", "SQL_SouthCentralUS_DB_2", "SQL_SouthIndia_DB_1", "SQL_SouthIndia_DB_2",
-          "SQL_SwitzerlandNorth_DB_1", "SQL_SwitzerlandNorth_DB_2",
-          "SQL_UAENorth_DB_1", "SQL_UAENorth_DB_2", "SQL_UKSouth_DB_1", "SQL_UKSouth_DB_2", "SQL_UKWest_DB_1", "SQL_UKWest_DB_2",
-          "SQL_WestCentralUS_DB_1", "SQL_WestCentralUS_DB_2", "SQL_WestEurope_DB_1", "SQL_WestEurope_DB_2",
-          "SQL_WestUS2_DB_1", "SQL_WestUS2_DB_2", "SQL_WestUS_DB_1", "SQL_WestUS_DB_2"
-        ], config.maintenance_configuration_name)
-      )
-    ])
-    error_message = "Invalid value for maintenance_configuration_name."
-  }
-
-  validation {
-    condition = can([
-      for database, config in var.databases : (
-        config.sku_name == null || contains([
-          "Basic", "BC_Gen5_2", "DS100", "DW100c", "ElasticPool", "GP_S_Gen5_2", "HS_Gen4_1", "P2", "S0",
-          # Add more SKU names as needed
-        ], config.sku_name)
-      )
-    ])
-    error_message = "Invalid value for sku_name. Allowed values are Basic, BC_Gen5_2, DS100, DW100c, ElasticPool, GP_S_Gen5_2, HS_Gen4_1, P2, S0, ... (add more as needed)."
-  }
-
-  validation {
-    condition = can([
-      for database, config in var.databases : (
-        config.long_term_retention_policy == null ? true : config.long_term_retention_policy.weekly_retention == null ? true : regex("^P(?:\\d+Y)?(?:\\d+M)?(?:\\d+W)?(?:\\d+D)?$", config.long_term_retention_policy.weekly_retention)
-      )
-    ])
-    error_message = "'long_term_retention_policy.weekly_retention' should be in ISO 8601 format (e.g., P1Y, P1M, P1W, or P7D)."
-  }
-
   default = {}
 }

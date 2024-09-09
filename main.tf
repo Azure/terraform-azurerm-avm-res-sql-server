@@ -6,16 +6,7 @@ data "azurerm_resource_group" "parent" {
 
 data "azurerm_client_config" "current" {}
 
-data "azurerm_mssql_server" "this" {
-  count = var.existing_parent_resource != null ? 1 : 0
-
-  name                = var.existing_parent_resource.name
-  resource_group_name = var.resource_group_name
-}
-
 resource "azurerm_mssql_server" "this" {
-  count = var.existing_parent_resource == null ? 1 : 0
-
   location                                     = try(data.azurerm_resource_group.parent[0].location, var.location)
   name                                         = var.name # calling code must supply the name
   resource_group_name                          = var.resource_group_name
