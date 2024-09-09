@@ -25,7 +25,7 @@ output "resource_id" {
   value       = try(azurerm_mssql_server.this[0].id, data.azurerm_mssql_server.this[0].id)
 }
 
-output "resource_id" {
+output "resource_name" {
   description = "This is the name of the resource."
   value       = try(azurerm_mssql_server.this[0].id, data.azurerm_mssql_server.this[0].name)
 }

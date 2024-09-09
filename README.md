@@ -498,6 +498,10 @@ Description: A map of elastic pools. The map key is the supplied input to var.el
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
+Description: This is the id of the resource.
+
+### <a name="output_resource_name"></a> [resource\_name](#output\_resource\_name)
+
 Description: This is the name of the resource.
 
 ## Modules
