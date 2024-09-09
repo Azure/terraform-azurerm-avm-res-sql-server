@@ -47,12 +47,13 @@ resource "random_password" "admin_password" {
 locals {
   databases = {
     sample_database = {
-      create_mode     = "Default"
-      collation       = "SQL_Latin1_General_CP1_CI_AS"
-      elastic_pool_id = module.sql_server.resource_elasticpools["sample_pool"].id
-      license_type    = "LicenseIncluded"
-      max_size_gb     = 50
-      sku_name        = "ElasticPool"
+      name             = "sample_database"
+      create_mode      = "Default"
+      collation        = "SQL_Latin1_General_CP1_CI_AS"
+      elastic_pool_key = "sample_pool"
+      license_type     = "LicenseIncluded"
+      max_size_gb      = 50
+      sku_name         = "ElasticPool"
 
       short_term_retention_policy = {
         retention_days           = 1
@@ -62,6 +63,7 @@ locals {
   }
   elastic_pools = {
     sample_pool = {
+      name = "sample_pool"
       sku = {
         name     = "StandardPool"
         capacity = 50

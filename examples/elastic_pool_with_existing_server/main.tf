@@ -44,16 +44,35 @@ resource "random_password" "admin_password" {
   special          = true
 }
 
-# This is the module call
-module "sql_server" {
-  source = "../../"
-  # source             = "Azure/avm-res-sql-server/azurerm"
-
-  enable_telemetry             = var.enable_telemetry
+resource "azurerm_mssql_server" "this" {
+  location                     = azurerm_resource_group.this.location
   name                         = module.naming.sql_server.name_unique
   resource_group_name          = azurerm_resource_group.this.name
+  version                      = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-  location                     = azurerm_resource_group.this.location
-  server_version               = "12.0"
+}
+
+# This is the module call
+module "sql_elastic_pool" {
+  source = "../../modules/elasticpool"
+  # source             = "Azure/avm-res-sql-server/azurerm//modules/elasticpool"
+
+  name     = "my-elasticpool"
+  location = azurerm_resource_group.this.location
+  sql_server = {
+    resource_id = azurerm_mssql_server.this.id
+  }
+}
+
+module "sql_database" {
+  source = "../../modules/database"
+  # source             = "Azure/avm-res-sql-server/azurerm//modules/database"
+
+  name = "my-database"
+  sql_server = {
+    resource_id = azurerm_mssql_server.this.id
+  }
+  elastic_pool_id = module.sql_elastic_pool.resource_id
+  sku_name        = "ElasticPool"
 }

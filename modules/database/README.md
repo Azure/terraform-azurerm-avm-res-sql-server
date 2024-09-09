@@ -25,7 +25,7 @@ module "avm-res-sql-server-database" {
   source = "Azure/avm-res-sql-server/azurerm//modules/database"
 
   sql_server = {
-    resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroupHub/providers/Microsoft.Network/virtualNetworks/myVNetRemote"
+    resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.Sql/servers/mySqlServer"
   }
   name = "my-database"
 }
@@ -48,7 +48,10 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) (resource)
+- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -100,6 +103,40 @@ Description: The mode to create the database.
 Type: `string`
 
 Default: `"Default"`
+
+### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
+
+Description: A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
+- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
+- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+
+Type:
+
+```hcl
+map(object({
+    name                                     = optional(string, null)
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_elastic_pool_id"></a> [elastic\_pool\_id](#input\_elastic\_pool\_id)
 
@@ -153,6 +190,24 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_lock"></a> [lock](#input\_lock)
+
+Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
+
+  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+
+Type:
+
+```hcl
+object({
+    kind = string
+    name = optional(string, null)
+  })
+```
+
+Default: `null`
+
 ### <a name="input_long_term_retention_policy"></a> [long\_term\_retention\_policy](#input\_long\_term\_retention\_policy)
 
 Description: The long-term retention policy for the database.
@@ -177,6 +232,24 @@ Description: The name of the maintenance configuration.
 Type: `string`
 
 Default: `null`
+
+### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
+
+Description:   Controls the Managed Identity configuration on this resource. The following properties can be specified:
+
+  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+  - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+
+Type:
+
+```hcl
+object({
+    system_assigned            = optional(bool, false)
+    user_assigned_resource_ids = optional(set(string), [])
+  })
+```
+
+Default: `{}`
 
 ### <a name="input_max_size_gb"></a> [max\_size\_gb](#input\_max\_size\_gb)
 
@@ -234,6 +307,38 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
+
+Description:   A map of role assignments to create on the <RESOURCE>. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+  - `principal_id` - The ID of the principal to assign the role to.
+  - `description` - (Optional) The description of the role assignment.
+  - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+  - `condition` - (Optional) The condition which will be used to scope the role assignment.
+  - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
+  - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
+  - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
+
+  > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+
+Type:
+
+```hcl
+map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_sample_name"></a> [sample\_name](#input\_sample\_name)
 
 Description: The name of the sample database.
@@ -259,7 +364,8 @@ Default:
 
 ```json
 {
-  "backup_interval_in_hours": 12
+  "backup_interval_in_hours": 12,
+  "retention_days": 35
 }
 ```
 
@@ -269,7 +375,7 @@ Description: The SKU name for the database.
 
 Type: `string`
 
-Default: `null`
+Default: `"P2"`
 
 ### <a name="input_storage_account_type"></a> [storage\_account\_type](#input\_storage\_account\_type)
 
@@ -305,14 +411,7 @@ object({
   })
 ```
 
-Default:
-
-```json
-{
-  "email_account_admins": "Disabled",
-  "state": "Disabled"
-}
-```
+Default: `null`
 
 ### <a name="input_transparent_data_encryption_enabled"></a> [transparent\_data\_encryption\_enabled](#input\_transparent\_data\_encryption\_enabled)
 
@@ -322,13 +421,29 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_transparent_data_encryption_key_automatic_rotation_enabled"></a> [transparent\_data\_encryption\_key\_automatic\_rotation\_enabled](#input\_transparent\_data\_encryption\_key\_automatic\_rotation\_enabled)
+
+Description: The key vault key name for transparent data encryption.
+
+Type: `bool`
+
+Default: `null`
+
+### <a name="input_transparent_data_encryption_key_vault_key_id"></a> [transparent\_data\_encryption\_key\_vault\_key\_id](#input\_transparent\_data\_encryption\_key\_vault\_key\_id)
+
+Description: The key vault key ID for transparent data encryption.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_zone_redundant"></a> [zone\_redundant](#input\_zone\_redundant)
 
 Description: Whether the database is zone redundant.
 
 Type: `bool`
 
-Default: `null`
+Default: `true`
 
 ## Outputs
 

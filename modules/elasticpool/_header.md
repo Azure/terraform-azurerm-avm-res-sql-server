@@ -23,8 +23,9 @@ module "avm-res-sql-server-elasticpool" {
   source = "Azure/avm-res-sql-server/azurerm//modules/elasticpool"
 
   sql_server = {
-    resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroupHub/providers/Microsoft.Network/virtualNetworks/myVNetRemote"
+    resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.Sql/servers/mySqlServer"
   }
-  name = "my-elasticpool"
+  name     = "my-elasticpool"
+  location = "eastus"
 }
 ```

@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# SQL Server and Elastic Pool
 
-This deploys the module in its simplest form.
+This illustrates how to use an existing SQL Server (i.e. an existing `azurerm_mssql_server` resource) and create an elastic pool with this module.
 
 ```hcl
 terraform {
@@ -50,18 +50,37 @@ resource "random_password" "admin_password" {
   special          = true
 }
 
-# This is the module call
-module "sql_server" {
-  source = "../../"
-  # source             = "Azure/avm-res-sql-server/azurerm"
-
-  enable_telemetry             = var.enable_telemetry
+resource "azurerm_mssql_server" "this" {
+  location                     = azurerm_resource_group.this.location
   name                         = module.naming.sql_server.name_unique
   resource_group_name          = azurerm_resource_group.this.name
+  version                      = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-  location                     = azurerm_resource_group.this.location
-  server_version               = "12.0"
+}
+
+# This is the module call
+module "sql_elastic_pool" {
+  source = "../../modules/elasticpool"
+  # source             = "Azure/avm-res-sql-server/azurerm//modules/elasticpool"
+
+  name     = "my-elasticpool"
+  location = azurerm_resource_group.this.location
+  sql_server = {
+    resource_id = azurerm_mssql_server.this.id
+  }
+}
+
+module "sql_database" {
+  source = "../../modules/database"
+  # source             = "Azure/avm-res-sql-server/azurerm//modules/database"
+
+  name = "my-database"
+  sql_server = {
+    resource_id = azurerm_mssql_server.this.id
+  }
+  elastic_pool_id = module.sql_elastic_pool.resource_id
+  sku_name        = "ElasticPool"
 }
 ```
 
@@ -80,6 +99,7 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 
@@ -116,9 +136,15 @@ Source: Azure/naming/azurerm
 
 Version: 0.3.0
 
-### <a name="module_sql_server"></a> [sql\_server](#module\_sql\_server)
+### <a name="module_sql_database"></a> [sql\_database](#module\_sql\_database)
 
-Source: ../../
+Source: ../../modules/database
+
+Version:
+
+### <a name="module_sql_elastic_pool"></a> [sql\_elastic\_pool](#module\_sql\_elastic\_pool)
+
+Source: ../../modules/elasticpool
 
 Version:
 

@@ -32,10 +32,10 @@ resource "azurerm_mssql_server" "this" {
     }
   }
   dynamic "identity" {
-    for_each = var.managed_identities != null ? { this = var.managed_identities } : {}
+    for_each = local.managed_identities.system_assigned_user_assigned
 
     content {
-      type         = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
+      type         = identity.value.type
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
@@ -47,14 +47,14 @@ resource "azurerm_management_lock" "this" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.name}")
-  scope      = azurerm_mssql_server.this[0].id
+  scope      = azurerm_mssql_server.this.id
 }
 
 resource "azurerm_role_assignment" "this" {
   for_each = var.role_assignments
 
   principal_id                           = each.value.principal_id
-  scope                                  = azurerm_mssql_server.this[0].id
+  scope                                  = azurerm_mssql_server.this.id
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
@@ -67,7 +67,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
   for_each = var.diagnostic_settings
 
   name                           = each.value.name != null ? each.value.name : "diag-${var.name}"
-  target_resource_id             = azurerm_mssql_server.this[0].id
+  target_resource_id             = azurerm_mssql_server.this.id
   eventhub_authorization_rule_id = each.value.event_hub_authorization_rule_resource_id
   eventhub_name                  = each.value.event_hub_name
   log_analytics_destination_type = each.value.log_analytics_destination_type

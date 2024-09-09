@@ -50,24 +50,6 @@ resource "random_password" "admin_password" {
   special          = true
 }
 
-locals {
-  databases = {
-    my_db = {
-      create_mode  = "Default"
-      collation    = "SQL_Latin1_General_CP1_CI_AS"
-      server_id    = module.sql_server.resource.id
-      license_type = "LicenseIncluded"
-      max_size_gb  = 50
-      sku_name     = "S0"
-
-      short_term_retention_policy = {
-        retention_days           = 1
-        backup_interval_in_hours = 24
-      }
-    }
-  }
-}
-
 resource "azurerm_mssql_server" "this" {
   location                     = azurerm_resource_group.this.location
   name                         = module.naming.sql_server.name_unique
@@ -78,18 +60,14 @@ resource "azurerm_mssql_server" "this" {
 }
 
 # This is the module call
-module "sql_server" {
-  source = "../../"
-  # source             = "Azure/avm-res-sql-server/azurerm"
+module "sql_database" {
+  source = "../../modules/database"
+  # source             = "Azure/avm-res-sql-server/azurerm//modules/database"
 
-  enable_telemetry             = var.enable_telemetry
-  existing_parent_resource     = { name = azurerm_mssql_server.this.name }
-  resource_group_name          = azurerm_resource_group.this.name
-  administrator_login          = "mysqladmin"
-  administrator_login_password = random_password.admin_password.result
-  location                     = azurerm_resource_group.this.location
-  server_version               = "12.0"
-  databases                    = local.databases
+  name = "my-database"
+  sql_server = {
+    resource_id = azurerm_mssql_server.this.id
+  }
 }
 ```
 
@@ -145,9 +123,9 @@ Source: Azure/naming/azurerm
 
 Version: 0.3.0
 
-### <a name="module_sql_server"></a> [sql\_server](#module\_sql\_server)
+### <a name="module_sql_database"></a> [sql\_database](#module\_sql\_database)
 
-Source: ../../
+Source: ../../modules/database
 
 Version:
 
