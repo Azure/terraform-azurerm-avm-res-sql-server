@@ -172,7 +172,10 @@ Default: `50`
 
 ### <a name="input_per_database_settings"></a> [per\_database\_settings](#input\_per\_database\_settings)
 
-Description: The per-database settings for the elastic pool.
+Description: The per database settings for the elastic pool.
+
+- `min_capacity` - The minimum capacity of the elastic pool in DTUs or vCores.
+- `max_capacity` - The maximum capacity of the elastic pool in DTUs or vCores.
 
 Type:
 
@@ -226,7 +229,12 @@ Default: `{}`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
-Description: The SKU details for the elastic pool.
+Description: The SKU of the elastic pool.
+
+- `name` - The name of the SKU.
+- `capacity` - The capacity of the SKU.
+- `tier` - The tier of the SKU.
+- `family` - The family of the SKU.
 
 Type:
 

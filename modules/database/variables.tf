@@ -106,7 +106,17 @@ variable "import" {
     storage_account_id     = string
   })
   default     = null
-  description = "The import configuration for the database."
+  description = <<DESCRIPTION
+Controls the Import configuration on this resource. The following properties can be specified:
+
+- `storage_uri` - (Required) Specifies the URI of the storage account to import the database from.
+- `storage_key` - (Required) Specifies the key of the storage account to import the database from.
+- `storage_key_type` - (Required) Specifies the type of the storage key. Possible values are `StorageAccessKey` and `SharedAccessKey`.
+- `administrator_login` - (Required) Specifies the login of the administrator.
+- `administrator_password` - (Required) Specifies the password of the administrator.
+- `authentication_type` - (Required) Specifies the authentication type. Possible values are `SQL` and `Windows`.
+- `storage_account_id` - (Required) Specifies the ID of the storage account to import the database from.
+DESCRIPTION
 }
 
 variable "ledger_enabled" {
@@ -148,7 +158,14 @@ variable "long_term_retention_policy" {
     week_of_year      = number
   })
   default     = null
-  description = "The long-term retention policy for the database."
+  description = <<DESCRIPTION
+Controls the Long Term Retention Policy configuration on this resource. The following properties can be specified:
+
+- `weekly_retention` - (Required) Specifies the weekly retention policy.
+- `monthly_retention` - (Required) Specifies the monthly retention policy.
+- `yearly_retention` - (Required) Specifies the yearly retention policy.
+- `week_of_year` - (Required) Specifies the week of the year to apply the yearly retention policy.
+DESCRIPTION
 }
 
 variable "maintenance_configuration_name" {
@@ -279,7 +296,12 @@ variable "short_term_retention_policy" {
     retention_days           = 35
     backup_interval_in_hours = 12
   }
-  description = "The short-term retention policy for the database."
+  description = <<DESCRIPTION
+Controls the Short Term Retention Policy configuration on this resource. The following properties can be specified:
+
+- `retention_days` - (Required) Specifies the number of days to keep in the Short Term Retention audit logs.
+- `backup_interval_in_hours` - (Required) Specifies the interval in hours to keep in the Short Term Retention audit logs.
+DESCRIPTION
 }
 
 variable "sku_name" {
@@ -318,7 +340,17 @@ variable "threat_detection_policy" {
     storage_endpoint           = string
   })
   default     = null
-  description = "The threat detection policy for the database."
+  description = <<DESCRIPTION
+Controls the Threat Detection Policy configuration on this resource. The following properties can be specified:
+
+- `state` - (Required) Specifies the state of the policy. Possible values are `Enabled` and `Disabled`.
+- `disabled_alerts` - (Required) Specifies the list of alerts that are disabled.
+- `email_account_admins` - (Required) Specifies the email address to which the alerts are sent.
+- `email_addresses` - (Required) Specifies the list of email addresses to which the alerts are sent.
+- `retention_days` - (Required) Specifies the number of days to keep in the Threat Detection audit logs.
+- `storage_account_access_key` - (Required) Specifies the access key of the storage account to which the Threat Detection audit logs are sent.
+- `storage_endpoint` - (Required) Specifies the endpoint of the storage account to which the Threat Detection audit logs are sent.
+DESCRIPTION
 }
 
 variable "transparent_data_encryption_enabled" {

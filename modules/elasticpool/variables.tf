@@ -143,8 +143,19 @@ variable "per_database_settings" {
     max_capacity = 25
     min_capacity = 0
   }
-  description = "The per-database settings for the elastic pool."
+  description = <<DESCRIPTION
+The per database settings for the elastic pool.
+
+- `min_capacity` - The minimum capacity of the elastic pool in DTUs or vCores.
+- `max_capacity` - The maximum capacity of the elastic pool in DTUs or vCores.
+
+DESCRIPTION
   nullable    = false
+
+  validation {
+    condition     = var.per_database_settings.min_capacity >= 0 && var.per_database_settings.max_capacity >= 0
+    error_message = "min_capacity and max_capacity must be greater than or equal to 0."
+  }
 }
 
 variable "role_assignments" {
@@ -189,7 +200,14 @@ variable "sku" {
     tier     = "Premium"
     family   = null
   }
-  description = "The SKU details for the elastic pool."
+  description = <<DESCRIPTION
+The SKU of the elastic pool.
+
+- `name` - The name of the SKU.
+- `capacity` - The capacity of the SKU.
+- `tier` - The tier of the SKU.
+- `family` - The family of the SKU.
+DESCRIPTION  
   nullable    = false
 
   validation {

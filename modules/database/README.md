@@ -156,7 +156,15 @@ Default: `true`
 
 ### <a name="input_import"></a> [import](#input\_import)
 
-Description: The import configuration for the database.
+Description: Controls the Import configuration on this resource. The following properties can be specified:
+
+- `storage_uri` - (Required) Specifies the URI of the storage account to import the database from.
+- `storage_key` - (Required) Specifies the key of the storage account to import the database from.
+- `storage_key_type` - (Required) Specifies the type of the storage key. Possible values are `StorageAccessKey` and `SharedAccessKey`.
+- `administrator_login` - (Required) Specifies the login of the administrator.
+- `administrator_password` - (Required) Specifies the password of the administrator.
+- `authentication_type` - (Required) Specifies the authentication type. Possible values are `SQL` and `Windows`.
+- `storage_account_id` - (Required) Specifies the ID of the storage account to import the database from.
 
 Type:
 
@@ -210,7 +218,12 @@ Default: `null`
 
 ### <a name="input_long_term_retention_policy"></a> [long\_term\_retention\_policy](#input\_long\_term\_retention\_policy)
 
-Description: The long-term retention policy for the database.
+Description: Controls the Long Term Retention Policy configuration on this resource. The following properties can be specified:
+
+- `weekly_retention` - (Required) Specifies the weekly retention policy.
+- `monthly_retention` - (Required) Specifies the monthly retention policy.
+- `yearly_retention` - (Required) Specifies the yearly retention policy.
+- `week_of_year` - (Required) Specifies the week of the year to apply the yearly retention policy.
 
 Type:
 
@@ -349,7 +362,10 @@ Default: `null`
 
 ### <a name="input_short_term_retention_policy"></a> [short\_term\_retention\_policy](#input\_short\_term\_retention\_policy)
 
-Description: The short-term retention policy for the database.
+Description: Controls the Short Term Retention Policy configuration on this resource. The following properties can be specified:
+
+- `retention_days` - (Required) Specifies the number of days to keep in the Short Term Retention audit logs.
+- `backup_interval_in_hours` - (Required) Specifies the interval in hours to keep in the Short Term Retention audit logs.
 
 Type:
 
@@ -395,7 +411,15 @@ Default: `null`
 
 ### <a name="input_threat_detection_policy"></a> [threat\_detection\_policy](#input\_threat\_detection\_policy)
 
-Description: The threat detection policy for the database.
+Description: Controls the Threat Detection Policy configuration on this resource. The following properties can be specified:
+
+- `state` - (Required) Specifies the state of the policy. Possible values are `Enabled` and `Disabled`.
+- `disabled_alerts` - (Required) Specifies the list of alerts that are disabled.
+- `email_account_admins` - (Required) Specifies the email address to which the alerts are sent.
+- `email_addresses` - (Required) Specifies the list of email addresses to which the alerts are sent.
+- `retention_days` - (Required) Specifies the number of days to keep in the Threat Detection audit logs.
+- `storage_account_access_key` - (Required) Specifies the access key of the storage account to which the Threat Detection audit logs are sent.
+- `storage_endpoint` - (Required) Specifies the endpoint of the storage account to which the Threat Detection audit logs are sent.
 
 Type:
 
