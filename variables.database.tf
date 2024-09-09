@@ -1,5 +1,76 @@
 variable "databases" {
-  description = "Map of databases."
+  description = <<DATABASES
+A map of objects used to describe any databases that are being created.  The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+- `name` - (required) The name to use for the database
+- `auto_pause_delay_in_minutes` - (Optional) - Time in minutes after which database is automatically paused.  A value of `-1` means that automatic pause is disabled.  This property is only settable for Serverless databases.
+- `create_mode` - (Optional) - The create mode of the database. Possible values are `Copy`, `Default`, `OnlineSecondary`, `PointInTimeRestore`, `Recovery`, `Restore`, `RestoreExternalBackup`, `RestoreExternalBackupSecondary`, `RestoreLongTermRetentionBackup`, and `Secondary`.  Mutually exclusive with `import`.  Changing this forces a new resource to be created.  Defaults to `Default`.
+- `elastic_pool_key` - (Optional) - The map key of the elastic pool containing this database.
+- `geo_backup_enabled` - (Optional) - A boolean that specifies if the Geo Backup Policy is enabled. Default to `true`.
+- `maintenance_configuration_name` -  (Optional) The name of the Public Maintenance Configuration window to apply to the database. Valid values include `SQL_Default`, `SQL_EastUS_DB_1`, `SQL_EastUS2_DB_1`, `SQL_SoutheastAsia_DB_1`, `SQL_AustraliaEast_DB_1`, `SQL_NorthEurope_DB_1`, `SQL_SouthCentralUS_DB_1`, `SQL_WestUS2_DB_1`, `SQL_UKSouth_DB_1`, `SQL_WestEurope_DB_1`, `SQL_EastUS_DB_2`, `SQL_EastUS2_DB_2`, `SQL_WestUS2_DB_2`, `SQL_SoutheastAsia_DB_2`, `SQL_AustraliaEast_DB_2`, `SQL_NorthEurope_DB_2`, `SQL_SouthCentralUS_DB_2`, `SQL_UKSouth_DB_2`, `SQL_WestEurope_DB_2`, `SQL_AustraliaSoutheast_DB_1`, `SQL_BrazilSouth_DB_1`, `SQL_CanadaCentral_DB_1`, `SQL_CanadaEast_DB_1`, `SQL_CentralUS_DB_1`, `SQL_EastAsia_DB_1`, `SQL_FranceCentral_DB_1`, `SQL_GermanyWestCentral_DB_1`, `SQL_CentralIndia_DB_1`, `SQL_SouthIndia_DB_1`, `SQL_JapanEast_DB_1`, `SQL_JapanWest_DB_1`, `SQL_NorthCentralUS_DB_1`, `SQL_UKWest_DB_1`, `SQL_WestUS_DB_1`, `SQL_AustraliaSoutheast_DB_2`, `SQL_BrazilSouth_DB_2`, `SQL_CanadaCentral_DB_2`, `SQL_CanadaEast_DB_2`, `SQL_CentralUS_DB_2`, `SQL_EastAsia_DB_2`, `SQL_FranceCentral_DB_2`, `SQL_GermanyWestCentral_DB_2`, `SQL_CentralIndia_DB_2`, `SQL_SouthIndia_DB_2`, `SQL_JapanEast_DB_2`, `SQL_JapanWest_DB_2`, `SQL_NorthCentralUS_DB_2`, `SQL_UKWest_DB_2`, `SQL_WestUS_DB_2`, `SQL_WestCentralUS_DB_1`, `SQL_FranceSouth_DB_1`, `SQL_WestCentralUS_DB_2`, `SQL_FranceSouth_DB_2`, `SQL_SwitzerlandNorth_DB_1`, `SQL_SwitzerlandNorth_DB_2`, `SQL_BrazilSoutheast_DB_1`, `SQL_UAENorth_DB_1`, `SQL_BrazilSoutheast_DB_2`, `SQL_UAENorth_DB_2`. Defaults to `SQL_Default`.
+- `ledger_enabled` - (Optional) - A boolean that specifies if this is a ledger database. Defaults to `false`. Changing this forces a new resource to be created.
+- `license_type` - (Optional) - Specifies the license type applied to this database. Possible values are `LicenseIncluded` and `BasePrice.`
+- `max_size_gb` - (Optional) - The max size of the database in gigabytes.
+- `min_capacity` - (Optional) - Minimal capacity that database will always have allocated, if not paused. This property is only settable for Serverless databases.
+- `restore_point_in_time` - (Optional) - Specifies the point in time (ISO8601 format) of the source database that will be restored to create the new database. This property is only settable for `create_mode` = `PointInTimeRestore` databases.
+- `recover_database_id` - (Optional) - The ID of the database to be recovered. This property is only applicable when the `create_mode` is `Recovery`.
+- `restore_dropped_database_id` - (Optional) - The ID of the database to be restored. This property is only applicable when the `create_mode` is `Restore`.
+- `read_replica_count` - (Optional) - The number of readonly secondary replicas associated with the database to which readonly application intent connections may be routed. This property is only settable for Hyperscale edition databases.
+- `read_scale` - (Optional) - If enabled, connections that have application intent set to readonly in their connection string may be routed to a readonly secondary replica. This property is only settable for Premium and Business Critical databases.
+- `sample_name` - (Optional) - Specifies the name of the sample schema to apply when creating this database. Possible value is `AdventureWorksLT`.
+- `sku_name` - (Optional) - Specifies the name of the SKU used by the database. For example, `GP_S_Gen5_2`,`HS_Gen4_1`,`BC_Gen5_2`, `ElasticPool`, `Basic`,`S0`, `P2` ,`DW100c`, `DS100`. Changing this from the HyperScale service tier to another service tier will create a new resource.
+- `storage_account_type` - (Optional) -Specifies the storage account type used to store backups for this database. Possible values are `Geo`, `GeoZone`, `Local and Zone`. Defaults to `Geo`.
+- `transparent_data_encryption_enabled` - If set to true, Transparent Data Encryption will be enabled on the database. Defaults to `true`. `transparent_data_encryption_enabled` can only be set to `false` on DW (e.g, DataWarehouse) server SKUs.
+- `zone_redundant` - Whether or not this database is zone redundant, which means the replicas of this database will be spread across multiple availability zones. This property is only settable for Premium and Business Critical databases.
+
+- `import` - (Optional(object({
+  - `storage_uri` - (Required) - Specifies the blob URI of the .bacpac file.
+  - `storage_key` - (Required) - Specifies the access key for the storage account.
+  - `storage_key_type` - (Required) - Specifies the type of access key for the storage account. Valid values are `StorageAccessKey` or `SharedAccessKey`.
+  - `administrator_login` - (Required) - Specifies the name of the SQL administrator.
+  - `administrator_password` - (Required) - Specifies the password of the SQL administrator.
+  - `authentication_type` - (Required) - Specifies the type of authentication used to access the server. Valid values are `SQL` or `ADPassword`.
+  - `storage_account_id` - (Optional) - The resource id for the storage account used to store BACPAC file. If set, private endpoint connection will be created for the storage account. Must match storage account used for storage_uri parameter.
+
+- `long_term_retention_policy - (Optional(object({
+  - `weekly_retention` - (Optional) - The weekly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 520 weeks. e.g. `P1Y`, `P1M`, `P1W` or `P7D`.
+  - `monthly_retention` - (Optional) - The monthly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 120 months. e.g. `P1Y`, `P1M`, `P4W` or `P30D`.
+  - `yearly_retention` - (Optional) - The yearly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 10 years. e.g. `P1Y`, `P12M`, `P52W` or `P365D`.
+  - `week_of_year` - (Optional) - The week of year to take the yearly backup. Value has to be between `1` and `52`.
+
+
+- `short_term_retention_policy - (Optional(object({
+  - `retention_days` - (Required) - Point In Time Restore configuration. Value has to be between `1` and `35`.
+  - `backup_interval_in_hours` - (Optional) - The hours between each differential backup. This is only applicable to live databases but not dropped databases. Value has to be `12` or `24`. Defaults to `12` hours.
+
+
+- `threat_detection_policy - (Optional(object({
+  - `state` - (Optional) - The State of the Policy. Possible values are `Enabled` or `Disabled`. Defaults to `Disabled`.
+  - `disabled_alerts` - (Optional) - Specifies a list of alerts which should be disabled. Possible values include `Access_Anomaly`, `Sql_Injection` and `Sql_Injection_Vulnerability`.
+  - `email_account_admins` - (Optional) - Should the account administrators be emailed when this alert is triggered? Possible values are `Enabled` or `Disabled`. Defaults to `Disabled`.
+  - `email_addresses` - (Optional) - A list of email addresses which alerts should be sent to.
+  - `retention_days` - (Optional) - Specifies the number of days to keep in the Threat Detection audit logs.
+  - `storage_account_access_key` - (Optional) - (Optional) Specifies the identifier key of the Threat Detection audit storage account. Required if `state` is `Enabled`.
+  - `storage_endpoint` - (Optional) - Specifies the blob storage endpoint (e.g. https://example.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs. Required if `state` is `Enabled`.
+
+- `tags` - Optional - Map of strings for use in tagging this specific object
+
+EXAMPLE INPUT: 
+
+databases = {
+  example_database = {
+    name = "example_database"
+    long_term_retention_policy = {
+      weekly_retention = "P1W"
+    }
+    short_term_retention_policy = {
+      retention_days = 35
+      backup_interval_in_hours = 24
+    }
+  }
+}
+  
+DATABASES
 
   type = map(object({
     name                                                       = string
