@@ -38,11 +38,9 @@ A map of objects used to describe any databases that are being created.  The map
   - `yearly_retention` - (Optional) - The yearly retention policy for an LTR backup in an ISO 8601 format. Valid value is between 1 to 10 years. e.g. `P1Y`, `P12M`, `P52W` or `P365D`.
   - `week_of_year` - (Optional) - The week of year to take the yearly backup. Value has to be between `1` and `52`.
 
-
 - `short_term_retention_policy - (Optional(object({
   - `retention_days` - (Required) - Point In Time Restore configuration. Value has to be between `1` and `35`.
   - `backup_interval_in_hours` - (Optional) - The hours between each differential backup. This is only applicable to live databases but not dropped databases. Value has to be `12` or `24`. Defaults to `12` hours.
-
 
 - `threat_detection_policy - (Optional(object({
   - `state` - (Optional) - The State of the Policy. Possible values are `Enabled` or `Disabled`. Defaults to `Disabled`.
@@ -52,6 +50,35 @@ A map of objects used to describe any databases that are being created.  The map
   - `retention_days` - (Optional) - Specifies the number of days to keep in the Threat Detection audit logs.
   - `storage_account_access_key` - (Optional) - (Optional) Specifies the identifier key of the Threat Detection audit storage account. Required if `state` is `Enabled`.
   - `storage_endpoint` - (Optional) - Specifies the blob storage endpoint (e.g. https://example.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs. Required if `state` is `Enabled`.
+
+- `role_assignments - (Optional(map(object({
+  - `role_definition_id_or_name` - (Required) - The ID or Name of the Role Definition to assign.
+  - `principal_id` - (Required) - The ID of the Principal to assign the Role Definition to.
+  - `description` - (Optional) - A description of the Role Assignment.
+  - `skip_service_principal_aad_check` - (Optional) - Should the AAD check for Service Principals be skipped? Defaults to `false`.
+  - `condition` - (Optional) - The condition of the Role Assignment.
+  - `condition_version` - (Optional) - The condition version of the Role Assignment.
+  - `delegated_managed_identity_resource_id` - (Optional) - The Resource ID of the Delegated Managed Identity.
+  - `principal_type` - (Optional) - The type of the Principal. Possible values are `User`, `Group`, `ServicePrincipal` or `DirectoryRoleTemplate`.
+
+- `lock - (Optional(object({
+  - `kind` - (Required) - The kind of lock. Possible values are `ReadOnly` and `CanNotDelete`.
+  - `name` - (Optional) - The name of the lock.
+
+- `diagnostic_settings - (Optional(map(object({
+  - `name` - (Optional) - The name of the Diagnostic Setting.
+  - `event_hub_authorization_rule_id` - (Optional) - The ID of the Event Hub Authorization Rule.
+  - `event_hub_name` - (Optional) - The name of the Event Hub.
+  - `log_analytics_destination_type` - (Optional) - The type of the Log Analytics Destination. Possible values are `Dedicated` and `Shared`.
+  - `log_analytics_workspace_id` - (Optional) - The ID of the Log Analytics Workspace.
+  - `marketplace_partner_resource_id` - (Optional) - The ID of the Marketplace Partner Resource.
+  - `storage_account_resource_id` - (Optional) - The ID of the Storage Account.
+  - `log_categories` - (Optional) - A list of log categories to send to the destination.
+  - `log_groups` - (Optional) - A list of log groups to send to the destination.
+
+- `managed_identities - (Optional(object({
+  - `system_assigned` - (Optional) - Is the system assigned managed identity enabled? Defaults to `false`.
+  - `user_assigned_resource_ids` - (Optional) - A list of User Assigned Managed Identity Resource IDs.
 
 - `tags` - Optional - Map of strings for use in tagging this specific object
 
