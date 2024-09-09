@@ -4,6 +4,8 @@ data "azurerm_resource_group" "parent" {
   name = var.resource_group_name
 }
 
+data "azurerm_client_config" "current" {}
+
 data "azurerm_mssql_server" "this" {
   count = var.existing_parent_resource != null ? 1 : 0
 
@@ -35,7 +37,7 @@ resource "azurerm_mssql_server" "this" {
       login_username              = azuread_administrator.value.login_username
       object_id                   = azuread_administrator.value.object_id
       azuread_authentication_only = azuread_administrator.value.azuread_authentication_only
-      tenant_id                   = azuread_administrator.value.tenant_id
+      tenant_id                   = coalesce(azuread_administrator.value.tenant_id, data.azurerm_client_config.current.tenant_id)
     }
   }
   dynamic "identity" {
