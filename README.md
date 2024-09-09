@@ -25,8 +25,6 @@ The following resources are used by this module:
 
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) (resource)
-- [azurerm_mssql_elasticpool.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_elasticpool) (resource)
 - [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
@@ -36,7 +34,6 @@ The following resources are used by this module:
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-- [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/mssql_server) (data source)
 - [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
@@ -119,10 +116,11 @@ Type:
 
 ```hcl
 map(object({
+    name                                = string
     auto_pause_delay_in_minutes         = optional(number)
     create_mode                         = optional(string, "Default")
     collation                           = optional(string)
-    elastic_pool_id                     = optional(string)
+    elastic_pool_key                    = optional(string)
     geo_backup_enabled                  = optional(bool, true)
     maintenance_configuration_name      = optional(string)
     ledger_enabled                      = optional(bool, false)
@@ -220,20 +218,22 @@ Type:
 
 ```hcl
 map(object({
-    sku = object({
+    name = string
+    sku = optional(object({
       name     = string
       capacity = number
       tier     = string
       family   = optional(string)
-    })
-    per_database_settings = object({
+    }))
+    per_database_settings = optional(object({
       min_capacity = number
       max_capacity = number
-    })
+    }))
     maintenance_configuration_name = optional(string, "SQL_Default")
     zone_redundant                 = optional(bool, "true")
     license_type                   = optional(string)
     max_size_gb                    = optional(number)
+    max_size_bytes                 = optional(number)
   }))
 ```
 
@@ -507,7 +507,19 @@ Description: This is the name of the resource.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_database"></a> [database](#module\_database)
+
+Source: ./modules/database
+
+Version:
+
+### <a name="module_elasticpool"></a> [elasticpool](#module\_elasticpool)
+
+Source: ./modules/elasticpool
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

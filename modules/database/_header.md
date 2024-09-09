@@ -26,6 +26,6 @@ module "avm-res-sql-server-database" {
   sql_server = {
     resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroupHub/providers/Microsoft.Network/virtualNetworks/myVNetRemote"
   }
-  name                                 = "my-database"
+  name = "my-database"
 }
 ```

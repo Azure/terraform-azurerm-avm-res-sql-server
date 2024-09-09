@@ -19,12 +19,12 @@ To use this module in your Terraform configuration, you'll need to provide value
 This example shows the basic usage of the module. It creates a new database.
 
 ```terraform
-module "avm-res-sql-server-elasticpool {
+module "avm-res-sql-server-elasticpool" {
   source = "Azure/avm-res-sql-server/azurerm//modules/elasticpool"
 
   sql_server = {
     resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroupHub/providers/Microsoft.Network/virtualNetworks/myVNetRemote"
   }
-  name                                 = "my-elasticpool"
+  name = "my-elasticpool"
 }
 ```
