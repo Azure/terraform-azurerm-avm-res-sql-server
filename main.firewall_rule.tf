@@ -3,7 +3,7 @@ resource "azurerm_mssql_firewall_rule" "this" {
 
   end_ip_address   = each.value.end_ip_address
   name             = each.key
-  server_id        = azurerm_mssql_server.this[0].id
+  server_id        = azurerm_mssql_server.this.id
   start_ip_address = each.value.start_ip_address
 
   dynamic "timeouts" {

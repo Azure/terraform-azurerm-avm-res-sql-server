@@ -53,9 +53,9 @@ resource "random_password" "admin_password" {
 locals {
   databases = {
     my_sample_db = {
+      name         = "my_sample_db"
       create_mode  = "Default"
       collation    = "SQL_Latin1_General_CP1_CI_AS"
-      server_id    = module.sql_server.resource.id
       license_type = "LicenseIncluded"
       max_size_gb  = 50
       sku_name     = "S0"
@@ -84,8 +84,8 @@ locals {
 # This is the module call
 module "sql_server" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
+  # source             = "Azure/avm-res-sql-server/azurerm"
+
   enable_telemetry             = var.enable_telemetry
   name                         = module.naming.sql_server.name_unique
   resource_group_name          = azurerm_resource_group.this.name

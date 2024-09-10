@@ -1,101 +1,101 @@
 variable "elastic_pools" {
-  description = "Map of elastic pools configurations."
-
   type = map(object({
-    sku = object({
+    name     = string
+    location = optional(string)
+    sku = optional(object({
       name     = string
       capacity = number
       tier     = string
       family   = optional(string)
-    })
-    per_database_settings = object({
+    }))
+    per_database_settings = optional(object({
       min_capacity = number
       max_capacity = number
-    })
+    }))
     maintenance_configuration_name = optional(string, "SQL_Default")
     zone_redundant                 = optional(bool, "true")
     license_type                   = optional(string)
     max_size_gb                    = optional(number)
+    max_size_bytes                 = optional(number)
+
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
+    })))
+
+    lock = optional(object({
+      kind = string
+      name = optional(string, null)
+    }))
+
+    diagnostic_settings = optional(map(object({
+      name                            = optional(string, null)
+      event_hub_authorization_rule_id = optional(string, null)
+      event_hub_name                  = optional(string, null)
+      log_analytics_destination_type  = optional(string, null)
+      log_analytics_workspace_id      = optional(string, null)
+      marketplace_partner_resource_id = optional(string, null)
+      storage_account_resource_id     = optional(string, null)
+      log_categories                  = optional(list(string))
+      log_groups                      = optional(list(string))
+    })))
+
+    tags = optional(map(string))
   }))
 
-  validation {
-    condition = can(
-      [for pool, config in var.elastic_pools :
+  default     = {}
+  description = <<DESCRIPTION
+A map of objects containing attributes for each Elastic Pool to be created.
 
-        (config.sku.name == "BasicPool" || config.sku.name == "StandardPool" || config.sku.name == "PremiumPool") &&
-        config.sku.tier == "Basic" || config.sku.tier == "Standard" || config.sku.tier == "Premium" &&
-        config.sku.family == null
-        ||
-        (config.sku.name == "GP_Gen4" || config.sku.name == "GP_Gen5" || config.sku.name == "GP_Fsv2" || config.sku.name == "GP_DC" ||
-        config.sku.name == "BC_Gen4" || config.sku.name == "BC_Gen5" || config.sku.name == "BC_DC" || config.sku.name == "HS_Gen5") &&
-        config.sku.tier == "GeneralPurpose" || config.sku.tier == "BusinessCritical" &&
-        config.sku.family != null
-      ]
-    )
-    error_message = "Invalid combination of 'sku' configurations in the elastic_pools variable."
-  }
+- `name` - (Required) Specifies the name of the Elastic Pool. Changing this forces a new resource to be created.
+- `location` - (Optional) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created.
 
-  validation {
-    condition = can(
-      [for pool, config in var.elastic_pools :
-        config.per_database_settings.min_capacity != null && config.per_database_settings.max_capacity != null
-      ]
-    )
-    error_message = "Both 'min_capacity' and 'max_capacity' must be specified for the per_database_settings block in the elastic_pools variable."
-  }
+- `sku` - (Optional) Specifies the SKU of the Elastic Pool. Changing this forces a new resource to be created.
+  - `name` - (Required) Specifies the name of the SKU. Changing this forces a new resource to be created.
+  - `capacity` - (Required) Specifies the capacity of the SKU. Changing this forces a new resource to be created.
+  - `tier` - (Required) Specifies the tier of the SKU. Changing this forces a new resource to be created.
+  - `family` - (Optional) Specifies the family of the SKU. Changing this forces a new resource to be created.
 
-  validation {
-    condition = can(
-      [for pool, config in var.elastic_pools :
-        contains([
-          "SQL_Default",
-          "SQL_AustraliaEast_DB_1", "SQL_AustraliaEast_DB_2",
-          "SQL_AustraliaSoutheast_DB_1", "SQL_AustraliaSoutheast_DB_2",
-          "SQL_BrazilSouth_DB_1", "SQL_BrazilSouth_DB_2", "SQL_BrazilSoutheast_DB_1", "SQL_BrazilSoutheast_DB_2",
-          "SQL_CanadaCentral_DB_1", "SQL_CanadaCentral_DB_2", "SQL_CanadaEast_DB_1", "SQL_CanadaEast_DB_2",
-          "SQL_CentralIndia_DB_1", "SQL_CentralIndia_DB_2", "SQL_CentralUS_DB_1", "SQL_CentralUS_DB_2",
-          "SQL_EastAsia_DB_1", "SQL_EastAsia_DB_2", "SQL_EastUS_DB_1", "SQL_EastUS_DB_2", "SQL_EastUS2_DB_1", "SQL_EastUS2_DB_2",
-          "SQL_FranceCentral_DB_1", "SQL_FranceCentral_DB_2", "SQL_FranceSouth_DB_1", "SQL_FranceSouth_DB_2",
-          "SQL_GermanyWestCentral_DB_1", "SQL_GermanyWestCentral_DB_2",
-          "SQL_JapanEast_DB_1", "SQL_JapanEast_DB_2", "SQL_JapanWest_DB_1", "SQL_JapanWest_DB_2",
-          "SQL_NorthCentralUS_DB_1", "SQL_NorthCentralUS_DB_2", "SQL_NorthEurope_DB_1", "SQL_NorthEurope_DB_2",
-          "SQL_SouthCentralUS_DB_1", "SQL_SouthCentralUS_DB_2", "SQL_SouthIndia_DB_1", "SQL_SouthIndia_DB_2",
-          "SQL_SoutheastAsia_DB_1", "SQL_SoutheastAsia_DB_2", "SQL_SwitzerlandNorth_DB_1", "SQL_SwitzerlandNorth_DB_2",
-          "SQL_UAENorth_DB_1", "SQL_UAENorth_DB_2", "SQL_UKSouth_DB_1", "SQL_UKSouth_DB_2", "SQL_UKWest_DB_1", "SQL_UKWest_DB_2",
-          "SQL_WestCentralUS_DB_1", "SQL_WestCentralUS_DB_2", "SQL_WestEurope_DB_1", "SQL_WestEurope_DB_2",
-          "SQL_WestUS_DB_1", "SQL_WestUS_DB_2", "SQL_WestUS2_DB_1", "SQL_WestUS2_DB_2"
-        ], config.maintenance_configuration_name)
-      ]
-    )
-    error_message = "Invalid value for 'maintenance_configuration_name' in the elastic_pools variable."
-  }
+- `per_database_settings` - (Optional) Specifies the per database settings for the Elastic Pool. Changing this forces a new resource to be created.
+  - `min_capacity` - (Required) Specifies the minimum capacity of the Elastic Pool. Changing this forces a new resource to be created.
+  - `max_capacity` - (Required) Specifies the maximum capacity of the Elastic Pool. Changing this forces a new resource to be created.
 
-  validation {
-    condition = can(
-      [for pool, config in var.elastic_pools :
-        config.zone_redundant == null || !config.zone_redundant || (config.sku.tier == "Premium" || config.sku.tier == "BusinessCritical") && config.zone_redundant
-      ]
-    )
-    error_message = "Invalid combination of 'zone_redundant' setting in the elastic_pools variable."
-  }
+- `maintenance_configuration_name` - (Optional) Specifies the name of the maintenance configuration to apply to this Elastic Pool. Changing this forces a new resource to be created.
+- `zone_redundant` - (Optional) Specifies whether or not this Elastic Pool is zone redundant. Changing this forces a new resource to be created.
+- `license_type` - (Optional) Specifies the license type for the Elastic Pool. Changing this forces a new resource to be created.
+- `max_size_gb` - (Optional) Specifies the maximum size of the Elastic Pool in gigabytes. Changing this forces a new resource to be created.
+- `max_size_bytes` - (Optional) Specifies the maximum size of the Elastic Pool in bytes. Changing this forces a new resource to be created.
 
-  validation {
-    condition = can(
-      [for pool, config in var.elastic_pools :
-        (config.license_type == null) || contains(["LicenseIncluded", "BasePrice"], config.license_type)
-      ]
-    )
-    error_message = "Invalid value for 'license_type' in the elastic_pools variable."
-  }
+- `role_assignments` - (Optional) Specifies the role assignments for the Elastic Pool. Changing this forces a new resource to be created.
+  - `role_definition_id_or_name` - (Required) Specifies the ID or name of the role definition to assign to the principal.
+  - `principal_id` - (Required) Specifies the ID of the principal to assign the role to.
+  - `description` - (Optional) Specifies the description of the role assignment.
+  - `skip_service_principal_aad_check` - (Optional) Specifies whether or not to skip the service principal AAD check.
+  - `condition` - (Optional) Specifies the condition of the role assignment.
+  - `condition_version` - (Optional) Specifies the condition version of the role assignment.
+  - `delegated_managed_identity_resource_id` - (Optional) Specifies the delegated managed identity resource ID of the role assignment.
+  - `principal_type` - (Optional) Specifies the principal type of the role assignment.
 
-  validation {
-    condition = can(
-      [for pool, config in var.elastic_pools :
-        (config.max_size_gb == null) || (config.max_size_gb >= 50)
-      ]
-    )
-    error_message = "Invalid value for 'max_size_gb' in the elastic_pools variable. Must be null or a non-negative number."
-  }
+- `lock` - (Optional) Specifies the lock for the Elastic Pool. Changing this forces a new resource to be created.
 
-  default = {}
+- `diagnostic_settings` - (Optional) Specifies the diagnostic settings for the Elastic Pool. Changing this forces a new resource to be created.
+  - `name` - (Optional) Specifies the name of the diagnostic setting.
+  - `event_hub_authorization_rule_id` - (Optional) Specifies the ID of the event hub authorization rule.
+  - `event_hub_name` - (Optional) Specifies the name of the event hub.
+  - `log_analytics_destination_type` - (Optional) Specifies the destination type of the log analytics.
+  - `log_analytics_workspace_id` - (Optional) Specifies the ID of the log analytics workspace.
+  - `marketplace_partner_resource_id` - (Optional) Specifies the ID of the marketplace partner resource.
+  - `storage_account_resource_id` - (Optional) Specifies the ID of the storage account.
+  - `log_categories` - (Optional) Specifies the log categories of the diagnostic setting.
+  - `log_groups` - (Optional) Specifies the log groups of the diagnostic setting.
+
+- `tags` - (Optional) A mapping of tags to assign to the resource.
+
+DESCRIPTION
 }

@@ -65,14 +65,6 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-variable "existing_parent_resource" {
-  type = object({
-    name = string
-  })
-  default     = null
-  description = "If supplied, this SQL Server will be used by parent resources, instead of creating a new SQL Server"
-}
-
 variable "lock" {
   type = object({
     kind = string
