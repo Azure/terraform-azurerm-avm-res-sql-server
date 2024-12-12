@@ -311,7 +311,7 @@ variable "sku_name" {
 
   validation {
     condition = var.sku_name == null || contains([
-      "Basic", "BC_Gen5_2", "DS100", "DW100c", "ElasticPool", "GP_S_Gen5_2", "HS_Gen4_1", "P2", "S0"
+      "Basic", "BC_Gen5_2", "DS100", "DW100c", "ElasticPool", "GP_S_Gen5_2", "HS_Gen4_1", "P2", "P1", "P2",	"P4",	"P6",	"P11",	"P15", "S0", "S1", "S2", "S3", "S4",	"S6", "S7",	"S9",	"S12"
     ], var.sku_name)
     error_message = "SKU must be one of Basic, BC_Gen5_2, DS100, DW100c, ElasticPool, GP_S_Gen5_2, HS_Gen4_1, P2, S0."
   }
