@@ -73,6 +73,6 @@ module "sql_server" {
     }
   }
   # This is required to disable the DNS zone group management.
-  # If you want to manage the DNS zone group externally, ex. with Azure Policy as in Enterprise Scale corp, you must set this to false.
+  # If you want to manage the DNS zone group externally, ex. with Azure Policy.
   private_endpoints_manage_dns_zone_group = false
 }

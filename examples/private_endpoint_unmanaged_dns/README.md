@@ -78,6 +78,9 @@ module "sql_server" {
       subnet_resource_id            = azurerm_subnet.this.id
     }
   }
+  # This is required to disable the DNS zone group management.
+  # If you want to manage the DNS zone group externally, ex. with Azure Policy.
+  private_endpoints_manage_dns_zone_group = false
 }
 ```
 
