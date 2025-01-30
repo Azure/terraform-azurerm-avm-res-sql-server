@@ -5,7 +5,7 @@ This illustrates how to deploy a SQL Server with a database.
 
 ```hcl
 terraform {
-  required_version = "~> 1.6"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -104,7 +104,7 @@ module "sql_server" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.108)
 
