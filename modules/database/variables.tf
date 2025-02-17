@@ -308,13 +308,6 @@ variable "sku_name" {
   type        = string
   default     = "P2"
   description = "The SKU name for the database."
-
-  validation {
-    condition = var.sku_name == null || contains([
-      "Basic", "BC_Gen5_2", "DS100", "DW100c", "ElasticPool", "GP_S_Gen5_2", "HS_Gen4_1", "P2", "S0"
-    ], var.sku_name)
-    error_message = "SKU must be one of Basic, BC_Gen5_2, DS100, DW100c, ElasticPool, GP_S_Gen5_2, HS_Gen4_1, P2, S0."
-  }
 }
 
 variable "storage_account_type" {
