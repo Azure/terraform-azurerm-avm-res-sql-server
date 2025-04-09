@@ -3,7 +3,7 @@ resource "azurerm_mssql_database" "this" {
   server_id                                                  = var.sql_server.resource_id
   auto_pause_delay_in_minutes                                = var.auto_pause_delay_in_minutes
   collation                                                  = var.collation
-  create_mode                                                = var.create_mode
+  create_mode                                                = var.import == null ? var.create_mode : null
   elastic_pool_id                                            = var.elastic_pool_id
   geo_backup_enabled                                         = var.geo_backup_enabled
   ledger_enabled                                             = var.ledger_enabled
