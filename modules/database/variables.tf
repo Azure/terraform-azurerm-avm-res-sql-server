@@ -97,13 +97,13 @@ variable "geo_backup_enabled" {
 
 variable "import" {
   type = object({
-    storage_uri            = string
-    storage_key            = string
-    storage_key_type       = string
-    administrator_login    = string
-    administrator_password = string
-    authentication_type    = string
-    storage_account_id     = string
+    storage_uri                  = string
+    storage_key                  = string
+    storage_key_type             = string
+    administrator_login          = string
+    administrator_login_password = string
+    authentication_type          = string
+    storage_account_id           = string
   })
   default     = null
   description = <<DESCRIPTION
@@ -113,7 +113,7 @@ Controls the Import configuration on this resource. The following properties can
 - `storage_key` - (Required) Specifies the key of the storage account to import the database from.
 - `storage_key_type` - (Required) Specifies the type of the storage key. Possible values are `StorageAccessKey` and `SharedAccessKey`.
 - `administrator_login` - (Required) Specifies the login of the administrator.
-- `administrator_password` - (Required) Specifies the password of the administrator.
+- `administrator_login_password` - (Required) Specifies the password of the administrator.
 - `authentication_type` - (Required) Specifies the authentication type. Possible values are `SQL` and `Windows`.
 - `storage_account_id` - (Required) Specifies the ID of the storage account to import the database from.
 DESCRIPTION
