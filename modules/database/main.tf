@@ -68,13 +68,13 @@ resource "azurerm_mssql_database" "this" {
     for_each = var.threat_detection_policy != null ? { this = var.threat_detection_policy } : {}
 
     content {
-      disabled_alerts            = var.threat_detection_policy.value.disabled_alerts
-      email_account_admins       = var.threat_detection_policy.value.email_account_admins
-      email_addresses            = var.threat_detection_policy.value.email_addresses
-      retention_days             = var.threat_detection_policy.value.retention_days
-      state                      = var.threat_detection_policy.value.state
-      storage_account_access_key = var.threat_detection_policy.value.storage_account_access_key
-      storage_endpoint           = var.threat_detection_policy.value.storage_endpoint
+      disabled_alerts            = var.threat_detection_policy.disabled_alerts
+      email_account_admins       = var.threat_detection_policy.email_account_admins
+      email_addresses            = var.threat_detection_policy.email_addresses
+      retention_days             = var.threat_detection_policy.retention_days
+      state                      = var.threat_detection_policy.state
+      storage_account_access_key = var.threat_detection_policy.storage_account_access_key
+      storage_endpoint           = var.threat_detection_policy.storage_endpoint
     }
   }
 
