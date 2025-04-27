@@ -139,7 +139,7 @@ Description: A map of objects used to describe any databases that are being crea
   - `storage_key` - (Required) - Specifies the access key for the storage account.
   - `storage_key_type` - (Required) - Specifies the type of access key for the storage account. Valid values are `StorageAccessKey` or `SharedAccessKey`.
   - `administrator_login` - (Required) - Specifies the name of the SQL administrator.
-  - `administrator_password` - (Required) - Specifies the password of the SQL administrator.
+  - `administrator_login_password` - (Required) - Specifies the password of the SQL administrator.
   - `authentication_type` - (Required) - Specifies the type of authentication used to access the server. Valid values are `SQL` or `ADPassword`.
   - `storage_account_id` - (Optional) - The resource id for the storage account used to store BACPAC file. If set, private endpoint connection will be created for the storage account. Must match storage account used for storage\_uri parameter.
 
@@ -243,7 +243,7 @@ map(object({
       storage_key            = string
       storage_key_type       = string
       administrator_login    = string
-      administrator_password = string
+      administrator_login_password = string
       authentication_type    = string
       storage_account_id     = optional(string)
     }))
