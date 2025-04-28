@@ -75,9 +75,9 @@ module "sql_server" {
   location                     = azurerm_resource_group.this.location
   server_version               = "12.0"
   diagnostic_settings = {
-  to_la = {
-    name                  = "to-la"
-    workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    to_la = {
+      name                  = "to-la"
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
     }
   }
 }

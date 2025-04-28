@@ -33,9 +33,7 @@ The following resources are used by this module:
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-- [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -239,13 +237,13 @@ map(object({
     zone_redundant                                             = optional(bool)
 
     import = optional(object({
-      storage_uri            = string
-      storage_key            = string
-      storage_key_type       = string
-      administrator_login    = string
+      storage_uri                  = string
+      storage_key                  = string
+      storage_key_type             = string
+      administrator_login          = string
       administrator_login_password = string
-      authentication_type    = string
-      storage_account_id     = optional(string)
+      authentication_type          = string
+      storage_account_id           = optional(string)
     }))
 
     long_term_retention_policy = optional(object({
@@ -287,15 +285,16 @@ map(object({
     }))
 
     diagnostic_settings = optional(map(object({
-      name                            = optional(string, null)
-      event_hub_authorization_rule_id = optional(string, null)
-      event_hub_name                  = optional(string, null)
-      log_analytics_destination_type  = optional(string, null)
-      log_analytics_workspace_id      = optional(string, null)
-      marketplace_partner_resource_id = optional(string, null)
-      storage_account_resource_id     = optional(string, null)
-      log_categories                  = optional(list(string))
-      log_groups                      = optional(list(string))
+      name                                     = optional(string, null)
+      event_hub_authorization_rule_resource_id = optional(string, null)
+      event_hub_name                           = optional(string, null)
+      log_analytics_destination_type           = optional(string, null)
+      workspace_resource_id                    = optional(string, null)
+      marketplace_partner_resource_id          = optional(string, null)
+      storage_account_resource_id              = optional(string, null)
+      log_categories                           = optional(list(string))
+      log_groups                               = optional(list(string))
+      metric_categories                        = optional(list(string))
     })))
 
     managed_identities = optional(object({
@@ -311,18 +310,18 @@ Default: `{}`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
-Description: A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-- `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-- `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-- `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-- `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-- `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+  - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
+  - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
+  - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+  - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+  - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+  - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+  - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+  - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
 
 Type:
 
@@ -430,15 +429,16 @@ map(object({
     }))
 
     diagnostic_settings = optional(map(object({
-      name                            = optional(string, null)
-      event_hub_authorization_rule_id = optional(string, null)
-      event_hub_name                  = optional(string, null)
-      log_analytics_destination_type  = optional(string, null)
-      log_analytics_workspace_id      = optional(string, null)
-      marketplace_partner_resource_id = optional(string, null)
-      storage_account_resource_id     = optional(string, null)
-      log_categories                  = optional(list(string))
-      log_groups                      = optional(list(string))
+      name                                     = optional(string, null)
+      event_hub_authorization_rule_resource_id = optional(string, null)
+      event_hub_name                           = optional(string, null)
+      log_analytics_destination_type           = optional(string, null)
+      workspace_resource_id                    = optional(string, null)
+      marketplace_partner_resource_id          = optional(string, null)
+      storage_account_resource_id              = optional(string, null)
+      log_categories                           = optional(list(string))
+      log_groups                               = optional(list(string))
+      metric_categories                        = optional(list(string))
     })))
 
     tags = optional(map(string))

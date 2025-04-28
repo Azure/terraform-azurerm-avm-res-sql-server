@@ -38,9 +38,21 @@ module "naming" {
   version = "0.3.0"
 }
 
+# This allows us to randomize the region for the resource group.
+module "regions" {
+  source  = "Azure/avm-utl-regions/azurerm"
+  version = "0.3.0"
+}
+
+# This allows us to randomize the region for the resource group.
+resource "random_integer" "region_index" {
+  max = length(module.regions.regions) - 1
+  min = 0
+}
+
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = "AustraliaEast"
+  location = module.regions.regions[random_integer.region_index.result].name
   name     = module.naming.resource_group.name_unique
 }
 
@@ -48,6 +60,12 @@ resource "random_password" "admin_password" {
   length           = 16
   override_special = "!#$%&*()-_=+[]{}<>:?"
   special          = true
+}
+
+resource "azurerm_log_analytics_workspace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.log_analytics_workspace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
 }
 
 # This is the module call
@@ -62,6 +80,12 @@ module "sql_server" {
   administrator_login_password = random_password.admin_password.result
   location                     = azurerm_resource_group.this.location
   server_version               = "12.0"
+  diagnostic_settings = {
+    to_la = {
+      name                  = "to-la"
+      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+    }
+  }
 }
 ```
 
@@ -80,7 +104,9 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 - [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -113,6 +139,12 @@ The following Modules are called:
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
 Source: Azure/naming/azurerm
+
+Version: 0.3.0
+
+### <a name="module_regions"></a> [regions](#module\_regions)
+
+Source: Azure/avm-utl-regions/azurerm
 
 Version: 0.3.0
 
