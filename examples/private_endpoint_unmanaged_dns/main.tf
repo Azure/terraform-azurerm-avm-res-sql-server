@@ -70,6 +70,7 @@ module "sql_server" {
     primary = {
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
       subnet_resource_id            = azurerm_subnet.this.id
+      subresource_name              = "sqlServer"
     }
   }
   # This is required to disable the DNS zone group management.
