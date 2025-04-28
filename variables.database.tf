@@ -82,7 +82,7 @@ A map of objects used to describe any databases that are being created.  The map
 
 - `tags` - Optional - Map of strings for use in tagging this specific object
 
-EXAMPLE INPUT: 
+EXAMPLE INPUT:
 
 databases = {
   example_database = {
@@ -96,7 +96,7 @@ databases = {
     }
   }
 }
-  
+
 DATABASES
 
   type = map(object({
@@ -173,15 +173,16 @@ DATABASES
     }))
 
     diagnostic_settings = optional(map(object({
-      name                            = optional(string, null)
-      event_hub_authorization_rule_id = optional(string, null)
-      event_hub_name                  = optional(string, null)
-      log_analytics_destination_type  = optional(string, null)
-      log_analytics_workspace_id      = optional(string, null)
-      marketplace_partner_resource_id = optional(string, null)
-      storage_account_resource_id     = optional(string, null)
-      log_categories                  = optional(list(string))
-      log_groups                      = optional(list(string))
+      name                                     = optional(string, null)
+      event_hub_authorization_rule_resource_id = optional(string, null)
+      event_hub_name                           = optional(string, null)
+      log_analytics_destination_type           = optional(string, null)
+      workspace_resource_id                    = optional(string, null)
+      marketplace_partner_resource_id          = optional(string, null)
+      storage_account_resource_id              = optional(string, null)
+      log_categories                           = optional(list(string))
+      log_groups                               = optional(list(string))
+      metric_categories                        = optional(list(string))
     })))
 
     managed_identities = optional(object({
