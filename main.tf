@@ -12,6 +12,7 @@ resource "azurerm_mssql_server" "this" {
   public_network_access_enabled                = var.public_network_access_enabled
   tags                                         = var.tags
   transparent_data_encryption_key_vault_key_id = var.transparent_data_encryption_key_vault_key_id
+  express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
 
   dynamic "azuread_administrator" {
     for_each = var.azuread_administrator != null ? { this = var.azuread_administrator } : {}

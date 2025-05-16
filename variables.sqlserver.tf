@@ -62,3 +62,9 @@ variable "transparent_data_encryption_key_vault_key_id" {
   default     = null
   description = "(Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer."
 }
+
+variable "express_vulnerability_assessment_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Whether the `Express Vulnerability Assessment` feature is enabled for this server. Defaults to `false`."
+}
