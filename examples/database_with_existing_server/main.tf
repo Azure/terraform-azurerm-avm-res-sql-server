@@ -46,7 +46,6 @@ resource "azurerm_mssql_server" "this" {
 # This is the module call
 module "sql_database" {
   source = "../../modules/database"
-  # source             = "Azure/avm-res-sql-server/azurerm//modules/database"
 
   name = "my-database"
   sql_server = {

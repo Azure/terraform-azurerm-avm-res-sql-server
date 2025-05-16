@@ -6,13 +6,13 @@ resource "azurerm_mssql_server" "this" {
   administrator_login                          = var.administrator_login
   administrator_login_password                 = var.administrator_login_password
   connection_policy                            = var.connection_policy
+  express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
   minimum_tls_version                          = "1.2"
   outbound_network_restriction_enabled         = var.outbound_network_restriction_enabled
   primary_user_assigned_identity_id            = var.primary_user_assigned_identity_id
   public_network_access_enabled                = var.public_network_access_enabled
   tags                                         = var.tags
   transparent_data_encryption_key_vault_key_id = var.transparent_data_encryption_key_vault_key_id
-  express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
 
   dynamic "azuread_administrator" {
     for_each = var.azuread_administrator != null ? { this = var.azuread_administrator } : {}

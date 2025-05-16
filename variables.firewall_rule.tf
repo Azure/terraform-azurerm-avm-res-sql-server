@@ -9,6 +9,7 @@ variable "firewall_rules" {
       update = optional(string)
     }))
   }))
+  default     = {}
   description = <<-EOT
  - `end_ip_address` - (Required) Specifies the End IP Address associated with this Firewall Rule.
  - `start_ip_address` - (Required) Specifies the Start IP Address associated with this Firewall Rule.
@@ -20,5 +21,4 @@ variable "firewall_rules" {
  - `read` - (Defaults to 5 minutes) Used when retrieving the MySQL Firewall Rule.
  - `update` - (Defaults to 30 minutes) Used when updating the MySQL Firewall Rule.
 EOT
-  default     = {}
 }

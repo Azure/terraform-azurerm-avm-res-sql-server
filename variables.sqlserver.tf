@@ -17,12 +17,6 @@ variable "administrator_login_password" {
   sensitive   = true
 }
 
-variable "connection_policy" {
-  type        = string
-  default     = null
-  description = "(Optional) The connection policy the server will use. Possible values are `Default`, `Proxy`, and `Redirect`. Defaults to `Default`."
-}
-
 variable "azuread_administrator" {
   type = object({
     azuread_authentication_only = optional(bool)
@@ -39,10 +33,16 @@ variable "azuread_administrator" {
 EOT
 }
 
-variable "public_network_access_enabled" {
+variable "connection_policy" {
+  type        = string
+  default     = null
+  description = "(Optional) The connection policy the server will use. Possible values are `Default`, `Proxy`, and `Redirect`. Defaults to `Default`."
+}
+
+variable "express_vulnerability_assessment_enabled" {
   type        = bool
   default     = false
-  description = "(Optional) Whether public network access is allowed for this server. Defaults to `true`."
+  description = "(Optional) Whether the `Express Vulnerability Assessment` feature is enabled for this server. Defaults to `false`."
 }
 
 variable "outbound_network_restriction_enabled" {
@@ -57,14 +57,14 @@ variable "primary_user_assigned_identity_id" {
   description = "(Optional) Specifies the primary user managed identity id. Required if `type` within the `identity` block is set to either `SystemAssigned, UserAssigned` or `UserAssigned` and should be set at same time as setting `identity_ids`."
 }
 
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Whether public network access is allowed for this server. Defaults to `true`."
+}
+
 variable "transparent_data_encryption_key_vault_key_id" {
   type        = string
   default     = null
   description = "(Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer."
-}
-
-variable "express_vulnerability_assessment_enabled" {
-  type        = bool
-  default     = false
-  description = "(Optional) Whether the `Express Vulnerability Assessment` feature is enabled for this server. Defaults to `false`."
 }
