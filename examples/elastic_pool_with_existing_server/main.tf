@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.26"
     }
     random = {
       source  = "hashicorp/random"
@@ -46,10 +46,9 @@ resource "azurerm_mssql_server" "this" {
 # This is the module call
 module "sql_elastic_pool" {
   source = "../../modules/elasticpool"
-  # source             = "Azure/avm-res-sql-server/azurerm//modules/elasticpool"
 
-  name     = "my-elasticpool"
   location = azurerm_resource_group.this.location
+  name     = "my-elasticpool"
   sql_server = {
     resource_id = azurerm_mssql_server.this.id
   }
@@ -57,7 +56,6 @@ module "sql_elastic_pool" {
 
 module "sql_database" {
   source = "../../modules/database"
-  # source             = "Azure/avm-res-sql-server/azurerm//modules/database"
 
   name = "my-database"
   sql_server = {

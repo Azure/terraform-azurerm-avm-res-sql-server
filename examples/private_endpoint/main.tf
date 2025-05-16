@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.26"
     }
     random = {
       source  = "hashicorp/random"
@@ -56,16 +56,16 @@ resource "random_password" "admin_password" {
 # This is the module call
 module "sql_server" {
   source = "../../"
+
+  location                     = azurerm_resource_group.this.location
+  resource_group_name          = azurerm_resource_group.this.name
+  server_version               = "12.0"
+  administrator_login          = "mysqladmin"
+  administrator_login_password = random_password.admin_password.result
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  enable_telemetry              = false
-  name                          = module.naming.sql_server.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  administrator_login           = "mysqladmin"
-  administrator_login_password  = random_password.admin_password.result
-  public_network_access_enabled = false
-  location                      = azurerm_resource_group.this.location
-  server_version                = "12.0"
+  enable_telemetry = false
+  name             = module.naming.sql_server.name_unique
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
@@ -73,4 +73,5 @@ module "sql_server" {
       subresource_name              = "sqlServer"
     }
   }
+  public_network_access_enabled = false
 }

@@ -9,7 +9,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.26"
     }
     random = {
       source  = "hashicorp/random"
@@ -62,16 +62,16 @@ resource "random_password" "admin_password" {
 # This is the module call
 module "sql_server" {
   source = "../../"
+
+  location                     = azurerm_resource_group.this.location
+  resource_group_name          = azurerm_resource_group.this.name
+  server_version               = "12.0"
+  administrator_login          = "mysqladmin"
+  administrator_login_password = random_password.admin_password.result
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  enable_telemetry              = false
-  name                          = module.naming.sql_server.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  administrator_login           = "mysqladmin"
-  administrator_login_password  = random_password.admin_password.result
-  public_network_access_enabled = false
-  location                      = azurerm_resource_group.this.location
-  server_version                = "12.0"
+  enable_telemetry = false
+  name             = module.naming.sql_server.name_unique
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
@@ -82,6 +82,7 @@ module "sql_server" {
   # This is required to disable the DNS zone group management.
   # If you want to manage the DNS zone group externally, ex. with Azure Policy.
   private_endpoints_manage_dns_zone_group = false
+  public_network_access_enabled           = false
 }
 ```
 
@@ -92,7 +93,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.26)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
