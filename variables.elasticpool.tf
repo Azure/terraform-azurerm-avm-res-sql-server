@@ -49,7 +49,6 @@ variable "elastic_pools" {
 
     tags = optional(map(string))
   }))
-
   default     = {}
   description = <<DESCRIPTION
 A map of objects containing attributes for each Elastic Pool to be created.

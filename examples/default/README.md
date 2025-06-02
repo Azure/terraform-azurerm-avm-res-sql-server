@@ -9,7 +9,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.26"
     }
     random = {
       source  = "hashicorp/random"
@@ -22,15 +22,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see<https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -53,15 +44,14 @@ resource "random_password" "admin_password" {
 # This is the module call
 module "sql_server" {
   source = "../../"
-  # source             = "Azure/avm-res-sql-server/azurerm"
 
-  enable_telemetry             = var.enable_telemetry
-  name                         = module.naming.sql_server.name_unique
+  location                     = azurerm_resource_group.this.location
   resource_group_name          = azurerm_resource_group.this.name
+  server_version               = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-  location                     = azurerm_resource_group.this.location
-  server_version               = "12.0"
+  enable_telemetry             = var.enable_telemetry
+  name                         = module.naming.sql_server.name_unique
 }
 ```
 
@@ -72,7 +62,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.26)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 

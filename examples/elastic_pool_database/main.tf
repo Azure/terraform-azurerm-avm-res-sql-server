@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.26"
     }
     random = {
       source  = "hashicorp/random"
@@ -16,15 +16,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see<https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -84,16 +75,16 @@ locals {
 # This is the module call
 module "sql_server" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  enable_telemetry             = var.enable_telemetry
-  name                         = module.naming.sql_server.name_unique
+
+  location                     = azurerm_resource_group.this.location
   resource_group_name          = azurerm_resource_group.this.name
+  server_version               = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-
-  databases      = local.databases
-  elastic_pools  = local.elastic_pools
-  location       = azurerm_resource_group.this.location
-  server_version = "12.0"
+  databases                    = local.databases
+  elastic_pools                = local.elastic_pools
+  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+  # ...
+  enable_telemetry = var.enable_telemetry
+  name             = module.naming.sql_server.name_unique
 }
