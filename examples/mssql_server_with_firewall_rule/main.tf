@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.26"
     }
     random = {
       source  = "hashicorp/random"
@@ -16,15 +16,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see<https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -47,16 +38,15 @@ resource "random_password" "admin_password" {
 # This is the module call
 module "sql_server_with_firewall" {
   source = "../../"
+
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location                      = azurerm_resource_group.this.location
-  server_version                = "12.0"
-  enable_telemetry              = var.enable_telemetry
-  name                          = module.naming.sql_server.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  administrator_login           = "mssqladmin"
-  administrator_login_password  = random_password.admin_password.result
-  public_network_access_enabled = true
+  location                     = azurerm_resource_group.this.location
+  resource_group_name          = azurerm_resource_group.this.name
+  server_version               = "12.0"
+  administrator_login          = "mssqladmin"
+  administrator_login_password = random_password.admin_password.result
+  enable_telemetry             = var.enable_telemetry
   firewall_rules = {
     single_ip = {
       start_ip_address = "40.112.8.12"
@@ -71,4 +61,6 @@ module "sql_server_with_firewall" {
       end_ip_address   = "0.0.0.0"
     }
   }
+  name                          = module.naming.sql_server.name_unique
+  public_network_access_enabled = true
 }
