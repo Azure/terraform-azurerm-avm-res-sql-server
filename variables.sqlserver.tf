@@ -42,7 +42,7 @@ variable "connection_policy" {
 variable "express_vulnerability_assessment_enabled" {
   type        = bool
   default     = true
-  description = "(Optional) Whether the `Express Vulnerability Assessment` feature is enabled for this server. Defaults to `false`."
+  description = "(Optional) Whether the `Express Vulnerability Assessment` feature is enabled for this server. Defaults to `true`."
 }
 
 variable "outbound_network_restriction_enabled" {
