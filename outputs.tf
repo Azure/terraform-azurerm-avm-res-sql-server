@@ -9,6 +9,7 @@ output "private_endpoints" {
 output "resource" {
   description = "This is the full output for the resource."
   value       = azurerm_mssql_server.this
+  sensitive   = true
 }
 
 output "resource_databases" {
