@@ -15,6 +15,7 @@ output "resource" {
 output "resource_databases" {
   description = "A map of databases. The map key is the supplied input to var.databases. The map value is the entire azurerm_mssql_database resource."
   value       = module.database
+  sensitive   = true
 }
 
 output "resource_elasticpools" {
