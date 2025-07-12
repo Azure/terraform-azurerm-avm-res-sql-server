@@ -22,10 +22,11 @@ variable "generate_administrator_login_password" {
   default     = false
   description = "(Optional) Whether to generate a random administrator login password. If true, the password will be generated and optionally stored in Key Vault using administrator_login_password_key_vault_configuration"
 }
+
 variable "administrator_login_password_key_vault_configuration" {
   type = object({
-    key_vault_resource_id          = string
-    name                           = optional(string, null)
+    key_vault_resource_id = string
+    name                  = optional(string, sql-server-administrator_login_password)
   })
   default     = null
   description = "Configuration for storing the generated administrator password in Key Vault. Only used when generate_administrator_login_password is true."
