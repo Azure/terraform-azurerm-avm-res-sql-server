@@ -4,7 +4,7 @@ resource "azurerm_mssql_server" "this" {
   resource_group_name                          = var.resource_group_name
   version                                      = var.server_version
   administrator_login                          = var.administrator_login
-  administrator_login_password = var.generate_administrator_login_password ? (var.administrator_login_password_key_vault_configuration != null ? azurerm_key_vault_secret.administrator_password[0].value : random_password.administrator_password[0].result) : var.administrator_login_password
+  administrator_login_password                 = var.generate_administrator_login_password ? random_password.administrator_password[0].result : var.administrator_login_password
   connection_policy                            = var.connection_policy
   express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
   minimum_tls_version                          = "1.2"
