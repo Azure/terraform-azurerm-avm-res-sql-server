@@ -32,3 +32,9 @@ output "resource_name" {
   description = "This is the name of the resource."
   value       = azurerm_mssql_server.this.name
 }
+
+output "generated_administrator_login_password" {
+  description = "The generated administrator login password (only when generate_administrator_login_password is true)"
+  value       = var.generate_administrator_login_password ? random_password.administrator_password[0].result : null
+  sensitive   = true
+}

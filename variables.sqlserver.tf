@@ -17,6 +17,20 @@ variable "administrator_login_password" {
   sensitive   = true
 }
 
+variable "generate_administrator_login_password" {
+  type        = bool
+  default     = false
+  description = "(Optional) Whether to generate a random administrator login password. If true, the password will be generated and optionally stored in Key Vault using administrator_login_password_key_vault_configuration"
+}
+variable "administrator_login_password_key_vault_configuration" {
+  type = object({
+    key_vault_resource_id          = string
+    name                           = optional(string, null)
+  })
+  default     = null
+  description = "Configuration for storing the generated administrator password in Key Vault. Only used when generate_administrator_login_password is true."
+}
+
 variable "azuread_administrator" {
   type = object({
     azuread_authentication_only = optional(bool)
@@ -68,3 +82,4 @@ variable "transparent_data_encryption_key_vault_key_id" {
   default     = null
   description = "(Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer."
 }
+
