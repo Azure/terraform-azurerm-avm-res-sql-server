@@ -29,11 +29,13 @@ variable "administrator_login_password_key_vault_configuration" {
     name = optional(string, null)
   })
   default = null
-  description = <<-EOT
-(Optional) Configuration for storing the SQL Server administrator login password as a secret in Azure Key Vault. If not provided, the password will not be stored in Key Vault as part of this module.
+description = <<-EOT
+(Optional) An object to configure storing the SQL Server administrator password as a secret in Azure Key Vault (KV).
+If omitted, the password won’t be saved in KV.
 
-- `resource_id`: string (required) = (required) The resource ID of the Key Vault where the credentials will be stored.
-- `name`: string (optional, default: null) = (optional) The name of the secret in the Key Vault. If not provided, a name will be generated using the pattern '<sql server name>-<administrator login name>-password'.
+ - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
+ - `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
+
 EOT
 }
 
