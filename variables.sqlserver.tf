@@ -13,23 +13,28 @@ variable "administrator_login" {
 variable "administrator_login_password" {
   type        = string
   default     = null
-  description = "(Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`."
+  description = "(Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `generate_administrator_login_password` is `true`, or `azuread_authentication_only` in the `azuread_administrator` block is `true`. If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`."
   sensitive   = true
 }
 
 variable "generate_administrator_login_password" {
   type        = bool
   default     = false
-  description = "(Optional) Whether to generate a random administrator login password. If true, the password will be generated and optionally stored in Key Vault using administrator_login_password_key_vault_configuration"
+  description = "(Optional) Specifies whether a password should be randomly generated for the `administrator_login` user. Required unless `administrator_login_password` is explicitly set, or `azuread_authentication_only` in the `azuread_administrator` block is `true`. If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`."
 }
 
 variable "administrator_login_password_key_vault_configuration" {
   type = object({
-    key_vault_resource_id = string
-    name                  = optional(string, sql-server-administrator_login_password)
+    resource_id = string
+    name = optional(string, "${var.name}-${var.administrator_login}-password")
   })
-  default     = null
-  description = "Configuration for storing the generated administrator password in Key Vault. Only used when generate_administrator_login_password is true."
+  default = null
+  description = <<-EOT
+(Optional) Configuration for storing the SQL Server administrator login password as a secret in Azure Key Vault. If not provided, the password will not be stored in Key Vault as part of this module.
+
+- `resource_id`: string (required) = (required) The resource ID of the Key Vault where the credentials will be stored.
+- `name`: string (optional, default: null) = (optional) The name of the secret in the Key Vault. If not provided, a name will be generated using the pattern '<sql server name>-<administrator_login>-password'.
+EOT
 }
 
 variable "azuread_administrator" {

@@ -4,7 +4,7 @@ resource "azurerm_mssql_server" "this" {
   resource_group_name                          = var.resource_group_name
   version                                      = var.server_version
   administrator_login                          = var.administrator_login
-  administrator_login_password                 = var.generate_administrator_login_password ? random_password.administrator_password[0].result : var.administrator_login_password
+  administrator_login_password                 = var.administrator_login_password != null ? var.administrator_login_password : (var.generate_administrator_login_password ? random_password.administrator_login_password[0].result : null)
   connection_policy                            = var.connection_policy
   express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
   minimum_tls_version                          = "1.2"
@@ -91,10 +91,10 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
   }
 }
 
-# Generate random password when requested
-resource "random_password" "administrator_password" {
-  count   = var.generate_administrator_login_password ? 1 : 0
-  length           = 20
+# Generate random password if generate_administrator_login_password is true
+resource "random_password" "administrator_login_password" {
+  count            = var.generate_administrator_login_password ? 1 : 0
+  length           = 22
   min_lower        = 2
   min_numeric      = 2
   min_special      = 2
@@ -104,9 +104,10 @@ resource "random_password" "administrator_password" {
 }
 
 # Store password in Key Vault if configuration provided
-resource "azurerm_key_vault_secret" "administrator_password" {
-  count = var.generate_administrator_login_password ? 1 : 0
+# Requires that the deployment user has key vault secrets write access
+resource "azurerm_key_vault_secret" "administrator_login_password" {
+  count        = var.administrator_login_password_key_vault_configuration != null ? 1 : 0
+  key_vault_id = var.administrator_login_password_key_vault_configuration.resource_id
   name         = var.administrator_login_password_key_vault_configuration.name
-  value        = random_password.administrator_password[0].result
-  key_vault_id = var.administrator_login_password_key_vault_configuration.key_vault_resource_id
+  value        = azurerm_mssql_server.this.administrator_login_password
 }
