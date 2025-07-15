@@ -103,7 +103,7 @@ resource "random_password" "administrator_login_password" {
   special          = true
 }
 
-# Store password in Key Vault if configuration provided
+# Store administrator_login_password in Key Vault if administrator_login_password_key_vault_configuration is provided
 # Requires that the deployment user has key vault secrets write access
 resource "azurerm_key_vault_secret" "administrator_login_password" {
   count        = var.administrator_login_password_key_vault_configuration != null ? 1 : 0
