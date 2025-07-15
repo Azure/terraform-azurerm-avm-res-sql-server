@@ -108,6 +108,6 @@ resource "random_password" "administrator_login_password" {
 resource "azurerm_key_vault_secret" "administrator_login_password" {
   count        = var.administrator_login_password_key_vault_configuration != null ? 1 : 0
   key_vault_id = var.administrator_login_password_key_vault_configuration.resource_id
-  name         = var.administrator_login_password_key_vault_configuration.name
+  name         = administrator_login_password_key_vault_configuration.name != null ? administrator_login_password_key_vault_configuration.name : "${var.name}-${var.administrator_login}-password"
   value        = azurerm_mssql_server.this.administrator_login_password
 }

@@ -26,7 +26,7 @@ variable "generate_administrator_login_password" {
 variable "administrator_login_password_key_vault_configuration" {
   type = object({
     resource_id = string
-    name = optional(string, "${var.name}-${var.administrator_login}-password")
+    name = optional(string, null)
   })
   default = null
   description = <<-EOT
