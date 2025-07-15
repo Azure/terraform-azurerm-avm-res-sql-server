@@ -20,8 +20,13 @@ variable "administrator_login_password" {
 variable "generate_administrator_login_password" {
   type        = bool
   default     = false
-  description = "(Optional) Specifies whether a random password should be generated for the `administrator_login` user. Required unless `administrator_login_password` is explicitly set, or `azuread_authentication_only` in the `azuread_administrator` block is `true`. If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`."
+  description = <<-EOT
+    (Optional) Specifies whether a random password should be generated for the `administrator_login` user.
+    Required unless `administrator_login_password` is provided, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
+    If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`.
+  EOT
 }
+
 
 variable "administrator_login_password_key_vault_configuration" {
   type = object({
@@ -29,14 +34,13 @@ variable "administrator_login_password_key_vault_configuration" {
     name = optional(string, null)
   })
   default = null
-description = <<-EOT
-(Optional) An object to configure storing the SQL Server administrator password as a secret in Azure Key Vault (KV).
-If omitted, the password won’t be saved in KV.
+  description = <<-EOT
+    (Optional) An object to configure storing the SQL Server administrator password as a secret in Azure Key Vault (KV).
+    If omitted, the password won’t be saved in KV.
 
- - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
- - `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
-
-EOT
+    - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
+    - `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
+  EOT
 }
 
 variable "azuread_administrator" {
