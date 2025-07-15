@@ -20,7 +20,7 @@ variable "administrator_login_password" {
 variable "generate_administrator_login_password" {
   type        = bool
   default     = false
-  description = "(Optional) Specifies whether a password should be randomly generated for the `administrator_login` user. Required unless `administrator_login_password` is explicitly set, or `azuread_authentication_only` in the `azuread_administrator` block is `true`. If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`."
+  description = "(Optional) Specifies whether a random password should be generated for the `administrator_login` user. Required unless `administrator_login_password` is explicitly set, or `azuread_authentication_only` in the `azuread_administrator` block is `true`. If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`."
 }
 
 variable "administrator_login_password_key_vault_configuration" {
