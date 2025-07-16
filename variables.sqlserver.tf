@@ -29,7 +29,6 @@ variable "generate_administrator_login_password" {
 (Optional) Specifies whether a random password should be generated for the `administrator_login` user.
 Required unless `administrator_login_password` is provided, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
 If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`.
-
 EOT
 }
 
@@ -46,7 +45,6 @@ If omitted, the password won’t be saved in KV.
 
 - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
 - `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
-
 EOT
 }
 
