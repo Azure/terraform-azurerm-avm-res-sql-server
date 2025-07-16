@@ -14,21 +14,21 @@ variable "administrator_login_password" {
   type        = string
   default     = null
   sensitive   = true
-  description = <<-EOT
-(Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx).
-Required unless `generate_administrator_login_password` is `true`, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
-If `administrator_login_password` is provided, it takes priority over `generate_administrator_login_password`."
-EOT
+  description = <<DESCRIPTION
+  (Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx).
+  Required unless `generate_administrator_login_password` is `true`, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
+  If `administrator_login_password` is provided, it takes priority over `generate_administrator_login_password`."
+  DESCRIPTION
 }
 
 variable "generate_administrator_login_password" {
   type        = bool
   default     = false
-  description = <<-EOT
-(Optional) Specifies whether a random password should be generated for the `administrator_login` user.
-Required unless `administrator_login_password` is provided, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
-If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`.
-EOT
+  description = <<DESCRIPTION
+  (Optional) Specifies whether a random password should be generated for the `administrator_login` user.
+  Required unless `administrator_login_password` is provided, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
+  If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`.
+  DESCRIPTION
 }
 
 
@@ -38,13 +38,13 @@ variable "administrator_login_password_key_vault_configuration" {
     name = optional(string, null)
   })
   default = null
-  description = <<-EOT
-(Optional) An object to configure storing the SQL Server administrator password as a secret in Azure Key Vault (KV).
-If omitted, the password won’t be saved in KV.
+  description = <<DESCRIPTION
+  (Optional) An object to configure storing the SQL Server administrator password as a secret in Azure Key Vault (KV).
+  If omitted, the password won’t be saved in KV.
 
-- `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
-- `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
-EOT
+  - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
+  - `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
+  DESCRIPTION
 }
 
 variable "azuread_administrator" {
@@ -55,12 +55,11 @@ variable "azuread_administrator" {
     tenant_id                   = optional(string)
   })
   default     = null
-  description = <<-EOT
- - `azuread_authentication_only` - (Optional) Specifies whether only AD Users and administrators (e.g. `azuread_administrator[0].login_username`) can be used to login, or also local database users (e.g. `administrator_login`). When `true`, the `administrator_login` and `administrator_login_password` properties can be omitted.
- - `login_username` - (Required) The login username of the Azure AD Administrator of this SQL Server.
- - `object_id` - (Required) The object id of the Azure AD Administrator of this SQL Server.
- - `tenant_id` - (Optional) The tenant id of the Azure AD Administrator of this SQL Server.
-EOT
+  description = <<DESCRIPTION
+  - `azuread_authentication_only` - (Optional) Specifies whether only AD Users and administrators (e.g. `azuread_administrator[0].login_username`) can be used to login, or also local database users (e.g. `administrator_login`). When `true`, the `administrator_login` and `administrator_login_password` properties can be omitted.
+  - `login_username` - (Required) The login username of the Azure AD Administrator of this SQL Server.
+  - `tenant_id` - (Optional) The tenant id of the Azure AD Administrator of this SQL Server.
+  DESCRIPTION
 }
 
 variable "connection_policy" {
