@@ -43,7 +43,7 @@ variable "administrator_login_password_key_vault_configuration" {
   If omitted, the password won’t be saved in KV.
 
   - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
-  - `name` - (Optional) Name of the KV secret. Defaults to '<server name>-<administrator login password>-password' if not provided.
+  - `name` - (Optional) Name of the Key Vault secret. Defaults to '<server-name>-<admin-name>-password' if not specified.
   DESCRIPTION
 }
 
