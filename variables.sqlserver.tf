@@ -55,11 +55,12 @@ variable "azuread_administrator" {
     tenant_id                   = optional(string)
   })
   default     = null
-  description = <<DESCRIPTION
-  - `azuread_authentication_only` - (Optional) Specifies whether only AD Users and administrators (e.g. `azuread_administrator[0].login_username`) can be used to login, or also local database users (e.g. `administrator_login`). When `true`, the `administrator_login` and `administrator_login_password` properties can be omitted.
-  - `login_username` - (Required) The login username of the Azure AD Administrator of this SQL Server.
-  - `tenant_id` - (Optional) The tenant id of the Azure AD Administrator of this SQL Server.
-  DESCRIPTION
+  description = <<-EOT
+ - `azuread_authentication_only` - (Optional) Specifies whether only AD Users and administrators (e.g. `azuread_administrator[0].login_username`) can be used to login, or also local database users (e.g. `administrator_login`). When `true`, the `administrator_login` and `administrator_login_password` properties can be omitted.
+ - `login_username` - (Required) The login username of the Azure AD Administrator of this SQL Server.
+ - `object_id` - (Required) The object id of the Azure AD Administrator of this SQL Server.
+ - `tenant_id` - (Optional) The tenant id of the Azure AD Administrator of this SQL Server.
+EOT
 }
 
 variable "connection_policy" {

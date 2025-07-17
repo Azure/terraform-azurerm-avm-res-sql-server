@@ -96,11 +96,11 @@ resource "random_password" "administrator_login_password" {
   count            = var.generate_administrator_login_password ? 1 : 0
   length           = 22
   min_lower        = 2
+  min_upper        = 2
   min_numeric      = 2
   min_special      = 2
-  min_upper        = 2
-  override_special = "!#$%&()*+,-./:;<=>?@[]^_{|}~"
   special          = true
+  override_special = "!#$%&()*+,-./:;<=>?@[]^_{|}~"
 }
 
 # Store administrator_login_password in kv if administrator_login_password_key_vault_configuration is provided
