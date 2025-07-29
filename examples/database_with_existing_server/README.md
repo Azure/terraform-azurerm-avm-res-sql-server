@@ -6,6 +6,7 @@ This illustrates how to use an existing SQL Server (i.e. an existing `azurerm_ms
 ```hcl
 terraform {
   required_version = ">= 1.9, < 2.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
