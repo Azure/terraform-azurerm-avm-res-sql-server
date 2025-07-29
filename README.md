@@ -463,7 +463,7 @@ Description: (Optional) Whether the `Express Vulnerability Assessment` feature i
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_firewall_rules"></a> [firewall\_rules](#input\_firewall\_rules)
 
