@@ -14,16 +14,10 @@ variable "administrator_login_password" {
   type        = string
   default     = null
   sensitive   = true
-  ephemeral   = (
-    var.administrator_login_password == null &&
-    var.generate_administrator_login_password == true &&
-    var.administrator_login_password_key_vault_configuration != null
-  ) ? false : true
   description = <<DESCRIPTION
   (Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx).
   Required unless `generate_administrator_login_password` is `true`, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
-  If `administrator_login_password` is provided, it takes priority over `generate_administrator_login_password`.
-  The password is ephemeral, unless a randomly generated password is used AND no key vault is provided for password storage.
+  If `administrator_login_password` is provided, it takes priority over `generate_administrator_login_password`."
   DESCRIPTION
 }
 
