@@ -211,7 +211,7 @@ DESCRIPTION
   nullable    = false
 
   validation {
-    condition     = ((var.sku.name == "BasicPool" || var.sku.name == "StandardPool" || var.sku.name == "PremiumPool") && (var.sku.tier == "Basic" || var.sku.tier == "Standard" || var.sku.tier == "Premium") && var.sku.family == null) || ((var.sku.name == "GP_Gen4" || var.sku.name == "GP_Gen5" || var.sku.name == "GP_Fsv2" || var.sku.name == "GP_DC" || var.sku.name == "BC_Gen4" || var.sku.name == "BC_Gen5" || var.sku.name == "BC_DC" || var.sku.name == "HS_Gen5") && (var.sku.tier == "GeneralPurpose" || var.sku.tier == "BusinessCritical") && var.sku.family != null)
+    condition     = ((var.sku.name == "BasicPool" || var.sku.name == "StandardPool" || var.sku.name == "PremiumPool") && (var.sku.tier == "Basic" || var.sku.tier == "Standard" || var.sku.tier == "Premium") && var.sku.family == null) || ((var.sku.name == "GP_Gen4" || var.sku.name == "GP_Gen5" || var.sku.name == "GP_Fsv2" || var.sku.name == "GP_DC" || var.sku.name == "BC_Gen4" || var.sku.name == "BC_Gen5" || var.sku.name == "BC_DC" || var.sku.name == "HS_Gen5") && (var.sku.tier == "GeneralPurpose" || var.sku.tier == "BusinessCritical" || var.sku.tier == "HyperScale" ) && var.sku.family != null)
     error_message = "Invalid combination of 'sku' configurations in the elastic_pools variable."
   }
 }
