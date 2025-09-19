@@ -636,7 +636,7 @@ Default: `true`
 
 ### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
 
-Description: (Optional) Whether public network access is allowed for this server. Defaults to `true`.
+Description: (Optional) Whether public network access is allowed for this server. Defaults to `false`.
 
 Type: `bool`
 
