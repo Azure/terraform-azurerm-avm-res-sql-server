@@ -82,6 +82,22 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_administrator_login_password_wo"></a> [administrator\_login\_password\_wo](#input\_administrator\_login\_password\_wo)
+
+Description: (Optional) The password associated with the `administrator_login` user (write-only). This is an alternative to `administrator_login_password` that provides enhanced security by not storing the password in Terraform state. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`. Cannot be used together with `administrator_login_password`.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_administrator_login_password_wo_version"></a> [administrator\_login\_password\_wo\_version](#input\_administrator\_login\_password\_wo\_version)
+
+Description: (Optional) The version of the write-only password. This is used in conjunction with `administrator_login_password_wo` to track password changes and rotations for ephemeral secrets.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_azuread_administrator"></a> [azuread\_administrator](#input\_azuread\_administrator)
 
 Description: - `azuread_authentication_only` - (Optional) Specifies whether only AD Users and administrators (e.g. `azuread_administrator[0].login_username`) can be used to login, or also local database users (e.g. `administrator_login`). When `true`, the `administrator_login` and `administrator_login_password` properties can be omitted.
