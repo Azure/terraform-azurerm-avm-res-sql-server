@@ -8,14 +8,14 @@ output "private_endpoints" {
 
 output "resource" {
   description = "This is the full output for the resource."
-  value       = azurerm_mssql_server.this
   sensitive   = true
+  value       = azurerm_mssql_server.this
 }
 
 output "resource_databases" {
   description = "A map of databases. The map key is the supplied input to var.databases. The map value is the entire azurerm_mssql_database resource."
-  value       = module.database
   sensitive   = true
+  value       = module.database
 }
 
 output "resource_elasticpools" {

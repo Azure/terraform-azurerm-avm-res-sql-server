@@ -212,14 +212,14 @@ Description: A map of objects used to describe any databases that are being crea
 
 EXAMPLE INPUT:
 
-databases = {
-  example_database = {
-    name = "example_database"
-    long_term_retention_policy = {
+databases = {  
+  example_database = {  
+    name = "example_database"  
+    long_term_retention_policy = {  
       weekly_retention = "P1W"
-    }
-    short_term_retention_policy = {
-      retention_days = 35
+    }  
+    short_term_retention_policy = {  
+      retention_days = 35  
       backup_interval_in_hours = 24
     }
   }
@@ -468,8 +468,8 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
