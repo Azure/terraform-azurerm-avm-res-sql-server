@@ -5,6 +5,8 @@ resource "azurerm_mssql_server" "this" {
   version                                      = var.server_version
   administrator_login                          = var.administrator_login
   administrator_login_password                 = var.administrator_login_password
+  administrator_login_password_wo              = var.administrator_login_password_wo
+  administrator_login_password_wo_version      = var.administrator_login_password_wo_version
   connection_policy                            = var.connection_policy
   express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
   minimum_tls_version                          = "1.2"

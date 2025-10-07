@@ -17,6 +17,24 @@ variable "administrator_login_password" {
   sensitive   = true
 }
 
+variable "administrator_login_password_wo" {
+  type        = string
+  default     = null
+  description = "(Optional) The password associated with the `administrator_login` user (write-only). This is an alternative to `administrator_login_password` that provides enhanced security by not storing the password in Terraform state. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`. Cannot be used together with `administrator_login_password`."
+  sensitive   = true
+
+  validation {
+    condition     = !(var.administrator_login_password != null && var.administrator_login_password_wo != null)
+    error_message = "The variables `administrator_login_password` and `administrator_login_password_wo` cannot be used together. Please specify only one of them."
+  }
+}
+
+variable "administrator_login_password_wo_version" {
+  type        = number
+  default     = null
+  description = "(Optional) The version of the write-only password. This is used in conjunction with `administrator_login_password_wo` to track password changes and rotations for ephemeral secrets. Specify a value such as a simple incrementing number (e.g., 1, 2). Changing this value will indicate a password rotation."
+}
+
 variable "azuread_administrator" {
   type = object({
     azuread_authentication_only = optional(bool)

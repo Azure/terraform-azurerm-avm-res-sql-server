@@ -1,0 +1,16 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Force text files to have LF line endings
+*.tf text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+
+# Force binary files to be treated as binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
