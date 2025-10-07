@@ -53,14 +53,15 @@ locals {
 module "sql_server" {
   source = "../../"
 
-  location                        = azurerm_resource_group.this.location
-  resource_group_name             = azurerm_resource_group.this.name
-  server_version                  = "12.0"
-  administrator_login             = "mysqladmin"
-  administrator_login_password_wo = random_password.admin_password.result
-  enable_telemetry                = var.enable_telemetry
-  name                            = module.naming.sql_server.name_unique
-  tags                            = local.tags
+  location                                = azurerm_resource_group.this.location
+  resource_group_name                     = azurerm_resource_group.this.name
+  server_version                          = "12.0"
+  administrator_login                     = "mysqladmin"
+  administrator_login_password_wo         = random_password.admin_password.result
+  administrator_login_password_wo_version = 1
+  enable_telemetry                        = var.enable_telemetry
+  name                                    = module.naming.sql_server.name_unique
+  tags                                    = local.tags
 }
 ```
 
