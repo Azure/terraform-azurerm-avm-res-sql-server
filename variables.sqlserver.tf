@@ -32,7 +32,7 @@ variable "administrator_login_password_wo" {
 variable "administrator_login_password_wo_version" {
   type        = number
   default     = null
-  description = "(Optional) The version of the write-only password. This is used in conjunction with `administrator_login_password_wo` to track password changes and rotations for ephemeral secrets. Specify a value such as a simple incrementing number (e.g., \"1\", \"2\"). Changing this value will indicate a password rotation."
+  description = "(Optional) The version of the write-only password. This is used in conjunction with `administrator_login_password_wo` to track password changes and rotations for ephemeral secrets. Specify a value such as a simple incrementing number (e.g., 1, 2). Changing this value will indicate a password rotation."
 }
 
 variable "azuread_administrator" {
