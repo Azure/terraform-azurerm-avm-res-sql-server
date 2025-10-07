@@ -78,7 +78,7 @@ variable "primary_user_assigned_identity_id" {
 variable "public_network_access_enabled" {
   type        = bool
   default     = false
-  description = "(Optional) Whether public network access is allowed for this server. Defaults to `true`."
+  description = "(Optional) Whether public network access is allowed for this server. Defaults to `false`."
 }
 
 variable "transparent_data_encryption_key_vault_key_id" {
