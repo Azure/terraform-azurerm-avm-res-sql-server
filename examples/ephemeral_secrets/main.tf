@@ -30,7 +30,7 @@ resource "azurerm_resource_group" "this" {
 }
 
 resource "random_password" "admin_password" {
-  length           = 16
+  length           = 24
   override_special = "!#$%&*()-_=+[]{}<>:?"
   special          = true
 }
@@ -46,15 +46,12 @@ locals {
 module "sql_server" {
   source = "../../"
 
-  location                                = azurerm_resource_group.this.location
-  resource_group_name                     = azurerm_resource_group.this.name
-  server_version                          = "12.0"
-  administrator_login                     = "mysqladmin"
-  # Using ephemeral secrets instead of administrator_login_password
-  administrator_login_password_wo         = random_password.admin_password.result
-  administrator_login_password_wo_version = "v1.0"
-
-  enable_telemetry = var.enable_telemetry
-  name            = module.naming.sql_server.name_unique
-  tags            = local.tags
+  location                     = azurerm_resource_group.this.location
+  resource_group_name          = azurerm_resource_group.this.name
+  server_version               = "12.0"
+  administrator_login          = "mysqladmin"
+  administrator_login_password = random_password.admin_password.result
+  enable_telemetry             = var.enable_telemetry
+  name                         = module.naming.sql_server.name_unique
+  tags                         = local.tags
 }

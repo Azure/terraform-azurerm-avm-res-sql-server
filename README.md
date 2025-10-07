@@ -92,9 +92,9 @@ Default: `null`
 
 ### <a name="input_administrator_login_password_wo_version"></a> [administrator\_login\_password\_wo\_version](#input\_administrator\_login\_password\_wo\_version)
 
-Description: (Optional) The version of the write-only password. This is used in conjunction with `administrator_login_password_wo` to track password changes and rotations for ephemeral secrets.
+Description: (Optional) The version of the write-only password. This is used in conjunction with `administrator_login_password_wo` to track password changes and rotations for ephemeral secrets. Specify a value such as a simple incrementing number (e.g., "1", "2"). Changing this value will indicate a password rotation.
 
-Type: `string`
+Type: `number`
 
 Default: `null`
 
