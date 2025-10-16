@@ -13,8 +13,38 @@ variable "administrator_login" {
 variable "administrator_login_password" {
   type        = string
   default     = null
-  description = "(Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`."
   sensitive   = true
+  description = <<DESCRIPTION
+  (Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx).
+  Required unless `generate_administrator_login_password` is `true`, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
+  If `administrator_login_password` is provided, it takes priority over `generate_administrator_login_password`."
+  DESCRIPTION
+}
+
+variable "generate_administrator_login_password" {
+  type        = bool
+  default     = false
+  description = <<DESCRIPTION
+  (Optional) Specifies whether a random password should be generated for the `administrator_login` user.
+  Required unless `administrator_login_password` is provided, or `azuread_authentication_only` in the `azuread_administrator` block is `true`.
+  If `administrator_login_password` is specified, it takes priority over `generate_administrator_login_password`.
+  DESCRIPTION
+}
+
+
+variable "administrator_login_password_key_vault_configuration" {
+  type = object({
+    resource_id = string
+    name = optional(string, null)
+  })
+  default = null
+  description = <<DESCRIPTION
+  (Optional) An object to configure storing the SQL Server administrator password as a secret in Azure Key Vault (KV).
+  If omitted, the password won’t be saved in KV.
+
+  - `resource_id` - (Required) The resource ID of the KV where the secret will be stored. Deployment user needs KV secrets write access.
+  - `name` - (Optional) Name of the Key Vault secret. Defaults to '<server-name>-<admin-name>-password' if not specified.
+  DESCRIPTION
 }
 
 variable "azuread_administrator" {
