@@ -15,6 +15,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = "617e0f32-114b-4369-a2af-015ee7987a54"
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -29,7 +30,7 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
-resource "random_password" "admin_password" {
+ephemeral "random_password" "admin_password" {
   length           = 24
   override_special = "!#$%&*()-_=+[]{}<>:?"
   special          = true
@@ -44,13 +45,13 @@ locals {
 
 # Example using ephemeral secrets for enhanced security
 module "sql_server" {
-  source = "../../"
+  source = "../.."
 
   location                                = azurerm_resource_group.this.location
   resource_group_name                     = azurerm_resource_group.this.name
   server_version                          = "12.0"
   administrator_login                     = "mysqladmin"
-  administrator_login_password_wo         = random_password.admin_password.result
+  administrator_login_password_wo         = ephemeral.random_password.admin_password.result
   administrator_login_password_wo_version = 1
   enable_telemetry                        = var.enable_telemetry
   name                                    = module.naming.sql_server.name_unique

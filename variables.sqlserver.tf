@@ -21,7 +21,7 @@ variable "administrator_login_password_wo" {
   type        = string
   default     = null
   description = "(Optional) The password associated with the `administrator_login` user (write-only). This is an alternative to `administrator_login_password` that provides enhanced security by not storing the password in Terraform state. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`. Cannot be used together with `administrator_login_password`."
-  sensitive   = true
+  ephemeral   = true
 
   validation {
     condition     = !(var.administrator_login_password != null && var.administrator_login_password_wo != null)
