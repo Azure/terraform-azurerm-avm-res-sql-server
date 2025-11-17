@@ -36,7 +36,7 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
-resource "random_password" "admin_password" {
+ephemeral "random_password" "admin_password" {
   length           = 24
   override_special = "!#$%&*()-_=+[]{}<>:?"
   special          = true
@@ -51,13 +51,13 @@ locals {
 
 # Example using ephemeral secrets for enhanced security
 module "sql_server" {
-  source = "../../"
+  source = "../.."
 
   location                                = azurerm_resource_group.this.location
   resource_group_name                     = azurerm_resource_group.this.name
   server_version                          = "12.0"
   administrator_login                     = "mysqladmin"
-  administrator_login_password_wo         = random_password.admin_password.result
+  administrator_login_password_wo         = ephemeral.random_password.admin_password.result
   administrator_login_password_wo_version = 1
   enable_telemetry                        = var.enable_telemetry
   name                                    = module.naming.sql_server.name_unique
@@ -81,7 +81,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -116,7 +115,7 @@ Version: 0.3.0
 
 ### <a name="module_sql_server"></a> [sql\_server](#module\_sql\_server)
 
-Source: ../../
+Source: ../..
 
 Version:
 
