@@ -1,18 +1,17 @@
 resource "azurerm_mssql_server" "this" {
-  location                                     = var.location
-  name                                         = var.name # calling code must supply the name
-  resource_group_name                          = var.resource_group_name
-  version                                      = var.server_version
-  administrator_login                          = var.administrator_login
-  administrator_login_password                 = var.administrator_login_password
-  connection_policy                            = var.connection_policy
-  express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
-  minimum_tls_version                          = "1.2"
-  outbound_network_restriction_enabled         = var.outbound_network_restriction_enabled
-  primary_user_assigned_identity_id            = var.primary_user_assigned_identity_id
-  public_network_access_enabled                = var.public_network_access_enabled
-  tags                                         = var.tags
-  transparent_data_encryption_key_vault_key_id = var.transparent_data_encryption_key_vault_key_id
+  location                                 = var.location
+  name                                     = var.name # calling code must supply the name
+  resource_group_name                      = var.resource_group_name
+  version                                  = var.server_version
+  administrator_login                      = var.administrator_login
+  administrator_login_password             = var.administrator_login_password
+  connection_policy                        = var.connection_policy
+  express_vulnerability_assessment_enabled = var.express_vulnerability_assessment_enabled
+  minimum_tls_version                      = "1.2"
+  outbound_network_restriction_enabled     = var.outbound_network_restriction_enabled
+  primary_user_assigned_identity_id        = var.primary_user_assigned_identity_id
+  public_network_access_enabled            = var.public_network_access_enabled
+  tags                                     = var.tags
 
   dynamic "azuread_administrator" {
     for_each = var.azuread_administrator != null ? { this = var.azuread_administrator } : {}
@@ -31,6 +30,12 @@ resource "azurerm_mssql_server" "this" {
       type         = identity.value.type
       identity_ids = identity.value.user_assigned_resource_ids
     }
+  }
+
+  lifecycle {
+    # Ignore changes to transparent_data_encryption_key_vault_key_id
+    # This attribute is managed by the azurerm_mssql_server_transparent_data_encryption resource
+    ignore_changes = [transparent_data_encryption_key_vault_key_id]
   }
 }
 
@@ -88,5 +93,21 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
     content {
       category = metric.value
     }
+  }
+}
+
+# Transparent Data Encryption configuration for server-level key auto-rotation
+# This resource is only created when explicitly enabled via the boolean flag
+# Similar to azurerm_management_lock pattern for optional features
+resource "azurerm_mssql_server_transparent_data_encryption" "this" {
+  count = var.enable_transparent_data_encryption_with_customer_managed_key ? 1 : 0
+
+  server_id             = azurerm_mssql_server.this.id
+  auto_rotation_enabled = var.transparent_data_encryption_key_automatic_rotation_enabled
+  key_vault_key_id      = var.transparent_data_encryption_key_vault_key_id
+
+  lifecycle {
+    # Prevent destroy when only changing key or rotation settings
+    create_before_destroy = true
   }
 }

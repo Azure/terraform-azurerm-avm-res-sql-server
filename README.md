@@ -30,6 +30,7 @@ The following resources are used by this module:
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
+- [azurerm_mssql_server_transparent_data_encryption.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_transparent_data_encryption) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
@@ -450,6 +451,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_enable_customer_managed_key"></a> [enable\_customer\_managed\_key](#input\_enable\_customer\_managed\_key)
+
+Description: (Optional) Whether to enable customer-managed key (CMK) for Transparent Data Encryption (TDE). When set to `true`, you must also provide `transparent_data_encryption_key_vault_key_id`. When set to `false`, service-managed TDE keys are used. Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
@@ -682,9 +691,19 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_transparent_data_encryption_key_automatic_rotation_enabled"></a> [transparent\_data\_encryption\_key\_automatic\_rotation\_enabled](#input\_transparent\_data\_encryption\_key\_automatic\_rotation\_enabled)
+
+Description: (Optional) When enabled with a `transparent_data_encryption_key_vault_key_id`, the server will continuously check the Key Vault for new versions of the key. If a new key version is detected, the TDE protector on the server will be automatically rotated to the latest key version within 24 hours. Defaults to `false`.
+
+This provides zero-touch key rotation for enhanced security compliance. Must be used with customer-managed keys (CMK) configured via `transparent_data_encryption_key_vault_key_id`.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_transparent_data_encryption_key_vault_key_id"></a> [transparent\_data\_encryption\_key\_vault\_key\_id](#input\_transparent\_data\_encryption\_key\_vault\_key\_id)
 
-Description: (Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer.
+Description: (Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer. Required when `enable_customer_managed_key` is `true`.
 
 Type: `string`
 
@@ -717,6 +736,10 @@ Description: This is the id of the resource.
 ### <a name="output_resource_name"></a> [resource\_name](#output\_resource\_name)
 
 Description: This is the name of the resource.
+
+### <a name="output_transparent_data_encryption"></a> [transparent\_data\_encryption](#output\_transparent\_data\_encryption)
+
+Description: The Transparent Data Encryption configuration for the server, including auto-rotation status. Returns null when customer-managed key is not enabled.
 
 ## Modules
 

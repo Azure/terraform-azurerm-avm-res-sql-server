@@ -32,3 +32,13 @@ output "resource_name" {
   description = "This is the name of the resource."
   value       = azurerm_mssql_server.this.name
 }
+
+output "transparent_data_encryption" {
+  description = "The Transparent Data Encryption configuration for the server, including auto-rotation status. Returns null when customer-managed key is not configured."
+  value = var.enable_transparent_data_encryption_with_customer_managed_key ? {
+    key_vault_key_id      = var.transparent_data_encryption_key_vault_key_id
+    auto_rotation_enabled = var.transparent_data_encryption_key_automatic_rotation_enabled
+    resource_id           = azurerm_mssql_server_transparent_data_encryption.this[0].id
+    tde_mode              = "CustomerManaged"
+  } : null
+}

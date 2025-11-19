@@ -39,6 +39,12 @@ variable "connection_policy" {
   description = "(Optional) The connection policy the server will use. Possible values are `Default`, `Proxy`, and `Redirect`. Defaults to `Default`."
 }
 
+variable "enable_transparent_data_encryption_with_customer_managed_key" {
+  type        = bool
+  default     = false
+  description = "(Optional) Whether to enable Transparent Data Encryption (TDE) with customer-managed keys. When `true`, you must also provide `transparent_data_encryption_key_vault_key_id`. When `false`, service-managed TDE keys are used (default). Defaults to `false`."
+}
+
 variable "express_vulnerability_assessment_enabled" {
   type        = bool
   default     = false
@@ -63,8 +69,18 @@ variable "public_network_access_enabled" {
   description = "(Optional) Whether public network access is allowed for this server. Defaults to `false`."
 }
 
+variable "transparent_data_encryption_key_automatic_rotation_enabled" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    (Optional) When enabled with a `transparent_data_encryption_key_vault_key_id`, the server will continuously check the Key Vault for new versions of the key. If a new key version is detected, the TDE protector on the server will be automatically rotated to the latest key version within 24 hours. Defaults to `false`.
+
+    This provides zero-touch key rotation for enhanced security compliance. Must be used with customer-managed keys (CMK) configured via `transparent_data_encryption_key_vault_key_id`.
+  EOT
+}
+
 variable "transparent_data_encryption_key_vault_key_id" {
   type        = string
   default     = null
-  description = "(Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer."
+  description = "(Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer. When provided, customer-managed TDE is enabled; when `null`, service-managed TDE is used."
 }
