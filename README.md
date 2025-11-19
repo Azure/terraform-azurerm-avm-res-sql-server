@@ -451,14 +451,6 @@ map(object({
 
 Default: `{}`
 
-### <a name="input_enable_customer_managed_key"></a> [enable\_customer\_managed\_key](#input\_enable\_customer\_managed\_key)
-
-Description: (Optional) Whether to enable customer-managed key (CMK) for Transparent Data Encryption (TDE). When set to `true`, you must also provide `transparent_data_encryption_key_vault_key_id`. When set to `false`, service-managed TDE keys are used. Defaults to `false`.
-
-Type: `bool`
-
-Default: `false`
-
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
@@ -468,6 +460,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_enable_transparent_data_encryption_with_customer_managed_key"></a> [enable\_transparent\_data\_encryption\_with\_customer\_managed\_key](#input\_enable\_transparent\_data\_encryption\_with\_customer\_managed\_key)
+
+Description: (Optional) Whether to enable Transparent Data Encryption (TDE) with customer-managed keys. When `true`, you must also provide `transparent_data_encryption_key_vault_key_id`. When `false`, service-managed TDE keys are used (default). Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_express_vulnerability_assessment_enabled"></a> [express\_vulnerability\_assessment\_enabled](#input\_express\_vulnerability\_assessment\_enabled)
 
@@ -703,7 +703,7 @@ Default: `false`
 
 ### <a name="input_transparent_data_encryption_key_vault_key_id"></a> [transparent\_data\_encryption\_key\_vault\_key\_id](#input\_transparent\_data\_encryption\_key\_vault\_key\_id)
 
-Description: (Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer. Required when `enable_customer_managed_key` is `true`.
+Description: (Optional) The fully versioned `Key Vault` `Key` URL (e.g. `'https://<YourVaultName>.vault.azure.net/keys/<YourKeyName>/<YourKeyVersion>`) to be used as the `Customer Managed Key`(CMK/BYOK) for the `Transparent Data Encryption`(TDE) layer. When provided, customer-managed TDE is enabled; when `null`, service-managed TDE is used.
 
 Type: `string`
 
@@ -739,7 +739,7 @@ Description: This is the name of the resource.
 
 ### <a name="output_transparent_data_encryption"></a> [transparent\_data\_encryption](#output\_transparent\_data\_encryption)
 
-Description: The Transparent Data Encryption configuration for the server, including auto-rotation status. Returns null when customer-managed key is not enabled.
+Description: The Transparent Data Encryption configuration for the server, including auto-rotation status. Returns null when customer-managed key is not configured.
 
 ## Modules
 

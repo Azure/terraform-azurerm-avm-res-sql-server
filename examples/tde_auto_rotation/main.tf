@@ -118,17 +118,17 @@ module "sql_server" {
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
   # Enable TDE with customer-managed key and auto-rotation
-  enable_telemetry = var.enable_telemetry
+  enable_telemetry                                             = var.enable_telemetry
+  enable_transparent_data_encryption_with_customer_managed_key = true
   # Configure managed identity for SQL Server
   managed_identities = {
     system_assigned            = false
     user_assigned_resource_ids = [azurerm_user_assigned_identity.sql_identity.id]
   }
-  name                                                         = module.naming.sql_server.name_unique
-  primary_user_assigned_identity_id                            = azurerm_user_assigned_identity.sql_identity.id
-  enable_transparent_data_encryption_with_customer_managed_key = true
-  transparent_data_encryption_key_automatic_rotation_enabled   = true
-  transparent_data_encryption_key_vault_key_id                 = azurerm_key_vault_key.tde_key.id
+  name                                                       = module.naming.sql_server.name_unique
+  primary_user_assigned_identity_id                          = azurerm_user_assigned_identity.sql_identity.id
+  transparent_data_encryption_key_automatic_rotation_enabled = true
+  transparent_data_encryption_key_vault_key_id               = azurerm_key_vault_key.tde_key.id
 
   depends_on = [
     azurerm_key_vault_key.tde_key,
