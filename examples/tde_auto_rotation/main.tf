@@ -20,7 +20,6 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
-  subscription_id = "617e0f32-114b-4369-a2af-015ee7987a54"
 }
 
 # Get current client configuration
