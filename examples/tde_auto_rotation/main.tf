@@ -106,7 +106,7 @@ locals {
       max_size_gb                                                = 2
       transparent_data_encryption_enabled                        = true
       transparent_data_encryption_key_automatic_rotation_enabled = true
-      transparent_data_encryption_key_vault_key_id               = azurerm_key_vault_key.tde.versionless_id
+      transparent_data_encryption_key_vault_key_id               = azurerm_key_vault_key.tde.id
     }
   }
 }
