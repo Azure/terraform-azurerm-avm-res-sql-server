@@ -223,26 +223,43 @@ DESCRIPTION
 
   validation {
     condition = (
-      # DTU-based: BasicPool, StandardPool, PremiumPool - family must be null
-      (contains(["BasicPool", "StandardPool", "PremiumPool"], var.sku.name) &&
-        contains(["Basic", "Standard", "Premium"], var.sku.tier) &&
-        var.sku.family == null) ||
+      # DTU-based: name and tier must match exactly, family must be null
+      (var.sku.name == "BasicPool" && var.sku.tier == "Basic" && var.sku.family == null) ||
+      (var.sku.name == "StandardPool" && var.sku.tier == "Standard" && var.sku.family == null) ||
+      (var.sku.name == "PremiumPool" && var.sku.tier == "Premium" && var.sku.family == null) ||
       # vCore-based General Purpose: family must match name prefix
       (startswith(var.sku.name, "GP_") && var.sku.tier == "GeneralPurpose" &&
         ((startswith(var.sku.name, "GP_Gen5_") && var.sku.family == "Gen5") ||
           (startswith(var.sku.name, "GP_Fsv2_") && var.sku.family == "Fsv2") ||
-          (startswith(var.sku.name, "GP_DC_") && var.sku.family == "DC"))) ||
+      (startswith(var.sku.name, "GP_DC_") && var.sku.family == "DC"))) ||
       # vCore-based Business Critical: family must match name prefix
       (startswith(var.sku.name, "BC_") && var.sku.tier == "BusinessCritical" &&
         ((startswith(var.sku.name, "BC_Gen5_") && var.sku.family == "Gen5") ||
-          (startswith(var.sku.name, "BC_DC_") && var.sku.family == "DC"))) ||
+      (startswith(var.sku.name, "BC_DC_") && var.sku.family == "DC"))) ||
       # vCore-based Hyperscale: family must match name prefix
       (startswith(var.sku.name, "HS_") && var.sku.tier == "Hyperscale" &&
         ((startswith(var.sku.name, "HS_Gen5_") && var.sku.family == "Gen5") ||
           (startswith(var.sku.name, "HS_PRMS_") && var.sku.family == "PRMS") ||
-          (startswith(var.sku.name, "HS_MOPRMS_") && var.sku.family == "MOPRMS")))
+      (startswith(var.sku.name, "HS_MOPRMS_") && var.sku.family == "MOPRMS")))
     )
-    error_message = "Invalid SKU configuration. For DTU SKUs (BasicPool/StandardPool/PremiumPool), set family=null and tier=Basic/Standard/Premium. For vCore SKUs, the name prefix (GP_/BC_/HS_), tier (GeneralPurpose/BusinessCritical/Hyperscale), and family (Gen5/Fsv2/DC/PRMS/MOPRMS) must match."
+    error_message = <<-EOT
+      Invalid SKU configuration. Valid combinations are:
+      DTU-based (family must be null):
+        - name="BasicPool",    tier="Basic"
+        - name="StandardPool", tier="Standard"
+        - name="PremiumPool",  tier="Premium"
+      vCore General Purpose (tier="GeneralPurpose"):
+        - name prefix "GP_Gen5_",  family="Gen5"
+        - name prefix "GP_Fsv2_",  family="Fsv2"
+        - name prefix "GP_DC_",    family="DC"
+      vCore Business Critical (tier="BusinessCritical"):
+        - name prefix "BC_Gen5_",  family="Gen5"
+        - name prefix "BC_DC_",    family="DC"
+      vCore Hyperscale (tier="Hyperscale"):
+        - name prefix "HS_Gen5_",    family="Gen5"
+        - name prefix "HS_PRMS_",    family="PRMS"
+        - name prefix "HS_MOPRMS_",  family="MOPRMS"
+    EOT
   }
 }
 

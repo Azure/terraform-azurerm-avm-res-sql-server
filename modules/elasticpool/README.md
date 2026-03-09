@@ -226,21 +226,23 @@ Default: `{}`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
-Description: The SKU of the elastic pool.
+Description: The SKU configuration for the elastic pool. Choose one of the following:
 
-- `name` - The name of the SKU. Naming conventions:
-  - DTU-based: BasicPool, StandardPool, PremiumPool
-  - General Purpose standard-series (Gen5): GP_Gen5_2, GP_Gen5_4, GP_Gen5_6, etc.
-  - General Purpose Fsv2-series: GP_Fsv2_8, GP_Fsv2_10, GP_Fsv2_12, etc.
-  - General Purpose DC-series: GP_DC_2, GP_DC_4, GP_DC_6, etc.
-  - Business Critical standard-series (Gen5): BC_Gen5_4, BC_Gen5_6, BC_Gen5_8, etc.
-  - Business Critical DC-series: BC_DC_2, BC_DC_4, BC_DC_6, etc.
-  - Hyperscale standard-series (Gen5): HS_Gen5_4, HS_Gen5_6, HS_Gen5_8, etc.
-  - Hyperscale premium-series: HS_PRMS_4, HS_PRMS_6, HS_PRMS_8, etc.
-  - Hyperscale premium-series memory optimized: HS_MOPRMS_4, HS_MOPRMS_6, HS_MOPRMS_8, etc.
-- `capacity` - The capacity of the SKU (DTUs or vCores).
-- `tier` - The tier of the SKU (Basic, Standard, Premium, GeneralPurpose, BusinessCritical, Hyperscale).
-- `family` - The hardware family of the SKU (Gen5, Fsv2, DC). Required for vCore-based SKUs, must be null for DTU-based SKUs.
+**DTU-based SKUs** (set family to null):
+- BasicPool, StandardPool, or PremiumPool
+
+**vCore-based SKUs** (set family to the hardware generation):
+- General Purpose: GP\_Gen5\_*, GP\_Fsv2\_*, or GP\_DC\_*
+- Business Critical: BC\_Gen5\_* or BC\_DC\_*
+- Hyperscale: HS\_Gen5\_*, HS\_PRMS\_*, or HS\_MOPRMS\_*
+
+Properties:
+- `name` - The SKU name (e.g., "PremiumPool", "GP\_Gen5\_8", "BC\_Gen5\_16")
+- `capacity` - Number of DTUs or vCores
+- `tier` - Service tier (Basic, Standard, Premium, GeneralPurpose, BusinessCritical, or Hyperscale)
+- `family` - Hardware family (Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
+
+See: https://learn.microsoft.com/azure/azure-sql/database/resource-limits-vcore-elastic-pools
 
 Type:
 
@@ -263,78 +265,6 @@ Default:
   "tier": "Premium"
 }
 ```
-
-#### Supported SKU Configurations
-
-**DTU-based SKUs** (family must be null):
-- Basic: `{ name = "BasicPool", tier = "Basic", capacity = 50-1600, family = null }`
-- Standard: `{ name = "StandardPool", tier = "Standard", capacity = 50-3000, family = null }`
-- Premium: `{ name = "PremiumPool", tier = "Premium", capacity = 125-4000, family = null }`
-
-**General Purpose vCore-based SKUs**:
-- standard-series (Gen5): `{ name = "GP_Gen5_<vCores>", tier = "GeneralPurpose", capacity = <vCores>, family = "Gen5" }`
-  - Available vCores: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 80, 128
-- Fsv2-series: `{ name = "GP_Fsv2_<vCores>", tier = "GeneralPurpose", capacity = <vCores>, family = "Fsv2" }`
-  - Available vCores: 8, 10, 12, 14, 16, 18, 20, 24, 32, 36, 72
-  - Note: Fsv2-series will be retired October 1, 2026
-- DC-series: `{ name = "GP_DC_<vCores>", tier = "GeneralPurpose", capacity = <vCores>, family = "DC" }`
-  - Available vCores: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 32, 40
-  - Note: 10-40 vCores are currently in Preview
-
-**Business Critical vCore-based SKUs**:
-- standard-series (Gen5): `{ name = "BC_Gen5_<vCores>", tier = "BusinessCritical", capacity = <vCores>, family = "Gen5" }`
-  - Available vCores: 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 80, 128
-- DC-series: `{ name = "BC_DC_<vCores>", tier = "BusinessCritical", capacity = <vCores>, family = "DC" }`
-  - Available vCores: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 32, 40
-  - Note: 10-40 vCores are currently in Preview
-
-**Hyperscale vCore-based SKUs**:
-- standard-series (Gen5): `{ name = "HS_Gen5_<vCores>", tier = "Hyperscale", capacity = <vCores>, family = "Gen5" }`
-  - Available vCores: 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 80
-- premium-series: `{ name = "HS_PRMS_<vCores>", tier = "Hyperscale", capacity = <vCores>, family = "PRMS" }`
-  - Available vCores: 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 64, 80, 128
-- premium-series memory optimized: `{ name = "HS_MOPRMS_<vCores>", tier = "Hyperscale", capacity = <vCores>, family = "MOPRMS" }`
-  - Available vCores: 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 64, 80
-
-**Example configurations:**
-
-```hcl
-# DTU-based Premium elastic pool
-sku = {
-  name     = "PremiumPool"
-  capacity = 125
-  tier     = "Premium"
-  family   = null
-}
-
-# General Purpose Gen5 with 8 vCores
-sku = {
-  name     = "GP_Gen5_8"
-  capacity = 8
-  tier     = "GeneralPurpose"
-  family   = "Gen5"
-}
-
-# Business Critical Gen5 with 16 vCores
-sku = {
-  name     = "BC_Gen5_16"
-  capacity = 16
-  tier     = "BusinessCritical"
-  family   = "Gen5"
-}
-
-# Hyperscale premium-series with 32 vCores
-sku = {
-  name     = "HS_PRMS_32"
-  capacity = 32
-  tier     = "Hyperscale"
-  family   = "PRMS"
-}
-```
-
-For detailed resource limits and specifications, see:
-- [DTU-based resource limits](https://learn.microsoft.com/en-us/azure/azure-sql/database/resource-limits-dtu-elastic-pools)
-- [vCore-based resource limits](https://learn.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-elastic-pools)
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
