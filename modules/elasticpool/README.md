@@ -226,12 +226,23 @@ Default: `{}`
 
 ### <a name="input_sku"></a> [sku](#input\_sku)
 
-Description: The SKU of the elastic pool.
+Description: The SKU configuration for the elastic pool. Choose one of the following:
 
-- `name` - The name of the SKU.
-- `capacity` - The capacity of the SKU.
-- `tier` - The tier of the SKU.
-- `family` - The family of the SKU.
+**DTU-based SKUs** (set family to null):
+- BasicPool, StandardPool, or PremiumPool
+
+**vCore-based SKUs** (set family to the hardware generation):
+- General Purpose: GP\_Gen5\_*, GP\_Fsv2\_*, or GP\_DC\_*
+- Business Critical: BC\_Gen5\_* or BC\_DC\_*
+- Hyperscale: HS\_Gen5\_*, HS\_PRMS\_*, or HS\_MOPRMS\_*
+
+Properties:
+- `name` - The SKU name (e.g., "PremiumPool", "GP\_Gen5\_8", "BC\_Gen5\_16")
+- `capacity` - Number of DTUs or vCores
+- `tier` - Service tier (Basic, Standard, Premium, GeneralPurpose, BusinessCritical, or Hyperscale)
+- `family` - Hardware family (Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
+
+See: https://learn.microsoft.com/azure/azure-sql/database/resource-limits-vcore-elastic-pools
 
 Type:
 
