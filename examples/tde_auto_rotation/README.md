@@ -11,7 +11,7 @@ This example demonstrates how to configure Transparent Data Encryption (TDE) wit
 
 ```hcl
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.9, ~> 1.10"
 
   required_providers {
     azurerm = {
@@ -153,7 +153,7 @@ module "sql_server" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, ~> 1.10)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.26)
 
