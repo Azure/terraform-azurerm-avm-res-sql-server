@@ -34,6 +34,13 @@ resource "azurerm_mssql_server" "this" {
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
+
+  lifecycle {
+    precondition {
+      condition     = !(var.administrator_login_password_wo != null && var.administrator_login_password_wo_version == null)
+      error_message = "The variable `administrator_login_password_wo_version` must not be null when `administrator_login_password_wo` is set."
+    }
+  }
 }
 
 # required AVM resources interfaces
