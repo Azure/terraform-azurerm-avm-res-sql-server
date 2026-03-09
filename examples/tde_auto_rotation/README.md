@@ -68,8 +68,8 @@ resource "azurerm_key_vault" "this" {
   resource_group_name        = azurerm_resource_group.this.name
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization  = true
   purge_protection_enabled   = true
+  rbac_authorization_enabled = true
   soft_delete_retention_days = 7
 }
 
@@ -119,6 +119,9 @@ locals {
       transparent_data_encryption_enabled                        = true
       transparent_data_encryption_key_automatic_rotation_enabled = true
       transparent_data_encryption_key_vault_key_id               = azurerm_key_vault_key.tde.id
+      managed_identities = {
+        user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+      }
     }
   }
 }
