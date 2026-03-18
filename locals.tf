@@ -2,6 +2,18 @@ locals {
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
 }
 
+locals {
+  # Resolve the effective administrator password:
+  # - Use var.administrator_login_password if explicitly provided.
+  # - Otherwise, if generate_administrator_login_password is true, use the generated random password.
+  # - Otherwise leave null (Entra-only auth scenario).
+  administrator_login_password_effective = (
+    var.administrator_login_password != null
+    ? var.administrator_login_password
+    : (var.generate_administrator_login_password ? random_password.administrator_login_password[0].result : null)
+  )
+}
+
 # Private endpoint application security group associations.
 # We merge the nested maps from private endpoints and application security group associations into a single map.
 locals {

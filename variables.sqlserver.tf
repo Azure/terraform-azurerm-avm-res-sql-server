@@ -13,8 +13,28 @@ variable "administrator_login" {
 variable "administrator_login_password" {
   type        = string
   default     = null
-  description = "(Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`."
+  description = "(Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`. If omitted and `generate_administrator_login_password` is `true`, a random password will be generated."
   sensitive   = true
+}
+
+variable "administrator_login_password_key_vault_configuration" {
+  type = object({
+    key_vault_resource_id = string
+    secret_name           = optional(string, "sql-administrator-login-password")
+    expiration_date       = optional(string, null)
+    content_type          = optional(string, null)
+    tags                  = optional(map(string), null)
+  })
+  default     = null
+  description = <<-EOT
+(Optional) When set, the administrator login password (whether provided via `administrator_login_password` or auto-generated via `generate_administrator_login_password`) is stored as a secret in the specified Azure Key Vault.
+
+- `key_vault_resource_id` - (Required) The resource ID of the Key Vault in which to store the secret.
+- `secret_name`           - (Optional) The name of the Key Vault secret. Defaults to `"sql-administrator-login-password"`.
+- `expiration_date`       - (Optional) The expiration date of the secret in RFC3339 format (e.g. `"2026-01-01T00:00:00Z"`). If omitted, the secret does not expire.
+- `content_type`          - (Optional) The content type of the Key Vault secret.
+- `tags`                  - (Optional) A map of tags to assign to the Key Vault secret.
+EOT
 }
 
 variable "administrator_login_password_wo" {
@@ -61,6 +81,13 @@ variable "express_vulnerability_assessment_enabled" {
   type        = bool
   default     = false
   description = "(Optional) Whether the `Express Vulnerability Assessment` feature is enabled for this server. Defaults to `false`."
+}
+
+variable "generate_administrator_login_password" {
+  type        = bool
+  default     = false
+  description = "(Optional) When `true` and `administrator_login_password` is `null`, a random password is generated for the administrator login. The generated password can optionally be stored in Azure Key Vault by also setting `administrator_login_password_key_vault_configuration`. Defaults to `false`."
+  nullable    = false
 }
 
 variable "outbound_network_restriction_enabled" {
