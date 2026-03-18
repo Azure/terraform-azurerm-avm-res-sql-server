@@ -21,6 +21,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.26"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
 
@@ -66,6 +70,14 @@ resource "azurerm_role_assignment" "kv_secrets_officer" {
   role_definition_name = "Key Vault Secrets Officer"
 }
 
+# Wait for RBAC propagation before the module tries to write the secret.
+# Azure RBAC assignments can take up to 5 minutes to propagate globally.
+resource "time_sleep" "rbac_propagation" {
+  create_duration = "120s"
+
+  depends_on = [azurerm_role_assignment.kv_secrets_officer]
+}
+
 # This is the module call.
 # No administrator_login_password is provided — the module generates one automatically
 # and stores it as a secret in the Key Vault above.
@@ -84,7 +96,7 @@ module "sql_server" {
   generate_administrator_login_password = true
   name                                  = module.naming.sql_server.name_unique
 
-  depends_on = [azurerm_role_assignment.kv_secrets_officer]
+  depends_on = [time_sleep.rbac_propagation]
 }
 
 
@@ -99,6 +111,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.26)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.9)
+
 ## Resources
 
 The following resources are used by this module:
@@ -106,6 +120,7 @@ The following resources are used by this module:
 - [azurerm_key_vault.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_role_assignment.kv_secrets_officer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
+- [time_sleep.rbac_propagation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->

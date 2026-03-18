@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.26"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
 
@@ -51,6 +55,14 @@ resource "azurerm_role_assignment" "kv_secrets_officer" {
   role_definition_name = "Key Vault Secrets Officer"
 }
 
+# Wait for RBAC propagation before the module tries to write the secret.
+# Azure RBAC assignments can take up to 5 minutes to propagate globally.
+resource "time_sleep" "rbac_propagation" {
+  create_duration = "120s"
+
+  depends_on = [azurerm_role_assignment.kv_secrets_officer]
+}
+
 # This is the module call.
 # No administrator_login_password is provided — the module generates one automatically
 # and stores it as a secret in the Key Vault above.
@@ -69,7 +81,7 @@ module "sql_server" {
   generate_administrator_login_password = true
   name                                  = module.naming.sql_server.name_unique
 
-  depends_on = [azurerm_role_assignment.kv_secrets_officer]
+  depends_on = [time_sleep.rbac_propagation]
 }
 
 
