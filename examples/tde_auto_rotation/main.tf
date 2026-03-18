@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.9, ~> 1.10"
 
   required_providers {
     azurerm = {
@@ -22,9 +22,6 @@ provider "azurerm" {
   }
 }
 
-# Get current client configuration
-data "azurerm_client_config" "current" {}
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -37,20 +34,22 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
+data "azurerm_client_config" "current" {}
+
 resource "random_password" "admin_password" {
   length           = 16
   override_special = "!#$%&*()-_=+[]{}<>:?"
   special          = true
 }
 
-# Create a user-assigned managed identity for the SQL Server
-resource "azurerm_user_assigned_identity" "sql_identity" {
+# User-assigned managed identity for SQL Server CMK TDE
+resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
-  name                = "${module.naming.user_assigned_identity.name_unique}-sql"
+  name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
 
-# Create Key Vault for TDE keys
+# Key Vault for CMK TDE
 resource "azurerm_key_vault" "this" {
   location                   = azurerm_resource_group.this.location
   name                       = module.naming.key_vault.name_unique
@@ -58,36 +57,26 @@ resource "azurerm_key_vault" "this" {
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   purge_protection_enabled   = true
+  rbac_authorization_enabled = true
   soft_delete_retention_days = 7
-
-  access_policy {
-    key_permissions = [
-      "Get",
-      "List",
-      "Create",
-      "Delete",
-      "Update",
-      "GetRotationPolicy",
-      "SetRotationPolicy",
-      "Rotate",
-    ]
-    object_id = data.azurerm_client_config.current.object_id
-    tenant_id = data.azurerm_client_config.current.tenant_id
-  }
-  # Grant SQL Server identity access to Key Vault
-  access_policy {
-    key_permissions = [
-      "Get",
-      "WrapKey",
-      "UnwrapKey",
-    ]
-    object_id = azurerm_user_assigned_identity.sql_identity.principal_id
-    tenant_id = data.azurerm_client_config.current.tenant_id
-  }
 }
 
-# Create a key in Key Vault for TDE
-resource "azurerm_key_vault_key" "tde_key" {
+# Grant the deploying principal permissions to create the key
+resource "azurerm_role_assignment" "kv_admin" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  scope                = azurerm_key_vault.this.id
+  role_definition_name = "Key Vault Administrator"
+}
+
+# Grant the SQL Server managed identity permission to use the key for TDE
+resource "azurerm_role_assignment" "sql_kv_crypto" {
+  principal_id         = azurerm_user_assigned_identity.this.principal_id
+  scope                = azurerm_key_vault.this.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+}
+
+# Key Vault Key with rotation policy for CMK TDE
+resource "azurerm_key_vault_key" "tde" {
   key_opts = [
     "unwrapKey",
     "wrapKey",
@@ -97,7 +86,6 @@ resource "azurerm_key_vault_key" "tde_key" {
   name         = "tde-key"
   key_size     = 2048
 
-  # Optional: Configure automatic key rotation in Key Vault
   rotation_policy {
     expire_after         = "P90D"
     notify_before_expiry = "P29D"
@@ -106,9 +94,27 @@ resource "azurerm_key_vault_key" "tde_key" {
       time_before_expiry = "P30D"
     }
   }
+
+  depends_on = [azurerm_role_assignment.kv_admin]
 }
 
-# This is the module call with TDE auto-rotation enabled
+locals {
+  databases = {
+    tde_db = {
+      name                                                       = "tde-auto-rotation-db"
+      sku_name                                                   = "S0"
+      max_size_gb                                                = 2
+      transparent_data_encryption_enabled                        = true
+      transparent_data_encryption_key_automatic_rotation_enabled = true
+      transparent_data_encryption_key_vault_key_id               = azurerm_key_vault_key.tde.id
+      managed_identities = {
+        user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+      }
+    }
+  }
+}
+
+# This is the module call
 module "sql_server" {
   source = "../../"
 
@@ -117,21 +123,14 @@ module "sql_server" {
   server_version               = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-  # Enable TDE with customer-managed key and auto-rotation
-  enable_telemetry                                             = var.enable_telemetry
-  enable_transparent_data_encryption_with_customer_managed_key = true
-  # Configure managed identity for SQL Server
+  databases                    = local.databases
+  enable_telemetry             = var.enable_telemetry
   managed_identities = {
-    system_assigned            = false
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.sql_identity.id]
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
   }
-  name                                                       = module.naming.sql_server.name_unique
-  primary_user_assigned_identity_id                          = azurerm_user_assigned_identity.sql_identity.id
-  transparent_data_encryption_key_automatic_rotation_enabled = true
-  transparent_data_encryption_key_vault_key_id               = azurerm_key_vault_key.tde_key.id
+  name                                         = module.naming.sql_server.name_unique
+  primary_user_assigned_identity_id            = azurerm_user_assigned_identity.this.id
+  transparent_data_encryption_key_vault_key_id = azurerm_key_vault_key.tde.id
 
-  depends_on = [
-    azurerm_key_vault_key.tde_key,
-    azurerm_key_vault.this
-  ]
+  depends_on = [azurerm_role_assignment.sql_kv_crypto]
 }

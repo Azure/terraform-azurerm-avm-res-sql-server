@@ -1,17 +1,20 @@
 resource "azurerm_mssql_server" "this" {
-  location                                 = var.location
-  name                                     = var.name # calling code must supply the name
-  resource_group_name                      = var.resource_group_name
-  version                                  = var.server_version
-  administrator_login                      = var.administrator_login
-  administrator_login_password             = var.administrator_login_password
-  connection_policy                        = var.connection_policy
-  express_vulnerability_assessment_enabled = var.express_vulnerability_assessment_enabled
-  minimum_tls_version                      = "1.2"
-  outbound_network_restriction_enabled     = var.outbound_network_restriction_enabled
-  primary_user_assigned_identity_id        = var.primary_user_assigned_identity_id
-  public_network_access_enabled            = var.public_network_access_enabled
-  tags                                     = var.tags
+  location                                     = var.location
+  name                                         = var.name # calling code must supply the name
+  resource_group_name                          = var.resource_group_name
+  version                                      = var.server_version
+  administrator_login                          = var.administrator_login
+  administrator_login_password                 = var.administrator_login_password
+  administrator_login_password_wo              = var.administrator_login_password_wo
+  administrator_login_password_wo_version      = var.administrator_login_password_wo_version
+  connection_policy                            = var.connection_policy
+  express_vulnerability_assessment_enabled     = var.express_vulnerability_assessment_enabled
+  minimum_tls_version                          = "1.2"
+  outbound_network_restriction_enabled         = var.outbound_network_restriction_enabled
+  primary_user_assigned_identity_id            = var.primary_user_assigned_identity_id
+  public_network_access_enabled                = var.public_network_access_enabled
+  tags                                         = var.tags
+  transparent_data_encryption_key_vault_key_id = var.transparent_data_encryption_key_vault_key_id
 
   dynamic "azuread_administrator" {
     for_each = var.azuread_administrator != null ? { this = var.azuread_administrator } : {}
@@ -33,9 +36,10 @@ resource "azurerm_mssql_server" "this" {
   }
 
   lifecycle {
-    # Ignore changes to transparent_data_encryption_key_vault_key_id
-    # This attribute is managed by the azurerm_mssql_server_transparent_data_encryption resource
-    ignore_changes = [transparent_data_encryption_key_vault_key_id]
+    precondition {
+      condition     = !(var.administrator_login_password_wo != null && var.administrator_login_password_wo_version == null)
+      error_message = "The variable `administrator_login_password_wo_version` must not be null when `administrator_login_password_wo` is set."
+    }
   }
 }
 
