@@ -14,7 +14,7 @@ resource "random_password" "administrator_login_password" {
 }
 
 resource "azurerm_key_vault_secret" "administrator_login_password" {
-  count = var.administrator_login_password_key_vault_configuration != null && local.administrator_login_password_effective != null ? 1 : 0
+  count = var.administrator_login_password_key_vault_configuration != null && (var.administrator_login_password != null || var.generate_administrator_login_password) ? 1 : 0
 
   key_vault_id    = var.administrator_login_password_key_vault_configuration.key_vault_resource_id
   name            = var.administrator_login_password_key_vault_configuration.secret_name
