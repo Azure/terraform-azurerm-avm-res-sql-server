@@ -1,10 +1,36 @@
+resource "random_password" "administrator_login_password" {
+  count = var.generate_administrator_login_password && var.administrator_login_password == null ? 1 : 0
+
+  length           = 128
+  lower            = true
+  min_lower        = 1
+  min_numeric      = 1
+  min_special      = 1
+  min_upper        = 1
+  numeric          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
+  upper            = true
+}
+
+resource "azurerm_key_vault_secret" "administrator_login_password" {
+  count = var.administrator_login_password_key_vault_configuration != null && (var.administrator_login_password != null || var.generate_administrator_login_password) ? 1 : 0
+
+  key_vault_id    = var.administrator_login_password_key_vault_configuration.key_vault_resource_id
+  name            = var.administrator_login_password_key_vault_configuration.secret_name
+  content_type    = var.administrator_login_password_key_vault_configuration.content_type
+  expiration_date = var.administrator_login_password_key_vault_configuration.expiration_date
+  tags            = var.administrator_login_password_key_vault_configuration.tags
+  value           = local.administrator_login_password_effective
+}
+
 resource "azurerm_mssql_server" "this" {
   location                                     = var.location
   name                                         = var.name # calling code must supply the name
   resource_group_name                          = var.resource_group_name
   version                                      = var.server_version
   administrator_login                          = var.administrator_login
-  administrator_login_password                 = var.administrator_login_password
+  administrator_login_password                 = local.administrator_login_password_effective
   administrator_login_password_wo              = var.administrator_login_password_wo
   administrator_login_password_wo_version      = var.administrator_login_password_wo_version
   connection_policy                            = var.connection_policy
@@ -39,6 +65,22 @@ resource "azurerm_mssql_server" "this" {
     precondition {
       condition     = !(var.administrator_login_password_wo != null && var.administrator_login_password_wo_version == null)
       error_message = "The variable `administrator_login_password_wo_version` must not be null when `administrator_login_password_wo` is set."
+    }
+    precondition {
+      condition     = !(var.administrator_login_password != null && var.generate_administrator_login_password)
+      error_message = "The variables `administrator_login_password` and `generate_administrator_login_password` cannot be used together. Provide `administrator_login_password` OR set `generate_administrator_login_password = true`, not both."
+    }
+    precondition {
+      condition     = !(var.administrator_login_password_wo != null && var.generate_administrator_login_password)
+      error_message = "The variables `administrator_login_password_wo` and `generate_administrator_login_password` cannot be used together. Provide `administrator_login_password_wo` OR set `generate_administrator_login_password = true`, not both."
+    }
+    precondition {
+      condition     = !(var.administrator_login_password_key_vault_configuration != null && var.administrator_login_password_wo != null)
+      error_message = "Key Vault storage is not supported when using `administrator_login_password_wo`: write-only values cannot be read back and therefore cannot be stored in Key Vault. Use `administrator_login_password` or set `generate_administrator_login_password = true` to store the password in Key Vault."
+    }
+    precondition {
+      condition     = !(var.administrator_login_password_key_vault_configuration != null && local.administrator_login_password_effective == null && var.administrator_login_password_wo == null)
+      error_message = "Cannot store the administrator login password in Key Vault because no password is available. Either set `administrator_login_password` or set `generate_administrator_login_password = true`."
     }
   }
 }

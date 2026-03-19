@@ -26,6 +26,7 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azurerm_key_vault_secret.administrator_login_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
@@ -35,6 +36,7 @@ The following resources are used by this module:
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
+- [random_password.administrator_login_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
@@ -76,9 +78,39 @@ Default: `null`
 
 ### <a name="input_administrator_login_password"></a> [administrator\_login\_password](#input\_administrator\_login\_password)
 
-Description: (Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`.
+Description: (Optional) The password associated with the `administrator_login` user. Needs to comply with Azure's [Password Policy](https://msdn.microsoft.com/library/ms161959.aspx). Required unless `azuread_authentication_only` in the `azuread_administrator` block is `true`. If omitted and `generate_administrator_login_password` is `true`, a random password will be generated.
 
 Type: `string`
+
+Default: `null`
+
+### <a name="input_administrator_login_password_key_vault_configuration"></a> [administrator\_login\_password\_key\_vault\_configuration](#input\_administrator\_login\_password\_key\_vault\_configuration)
+
+Description: (Optional) When set, the administrator login password is stored as a secret in the specified Azure Key Vault.
+
+**Supported password sources** (mutually exclusive):
+- `administrator_login_password` — an explicitly provided, readable password.
+- `generate_administrator_login_password = true` — a module-generated random password.
+
+**Not supported**: `administrator_login_password_wo`. Write-only values are not readable by Terraform after being applied and therefore cannot be stored in Key Vault. Setting this variable together with `administrator_login_password_wo` will raise a validation error.
+
+- `key_vault_resource_id` - (Required) The resource ID of the Key Vault in which to store the secret.
+- `secret_name`           - (Optional) The name of the Key Vault secret. Defaults to `"sql-administrator-login-password"`.
+- `expiration_date`       - (Optional) The expiration date of the secret in RFC3339 format (e.g. `"2026-01-01T00:00:00Z"`). If omitted, the secret does not expire.
+- `content_type`          - (Optional) The content type of the Key Vault secret.
+- `tags`                  - (Optional) A map of tags to assign to the Key Vault secret.
+
+Type:
+
+```hcl
+object({
+    key_vault_resource_id = string
+    secret_name           = optional(string, "sql-administrator-login-password")
+    expiration_date       = optional(string, null)
+    content_type          = optional(string, null)
+    tags                  = optional(map(string), null)
+  })
+```
 
 Default: `null`
 
@@ -513,6 +545,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_generate_administrator_login_password"></a> [generate\_administrator\_login\_password](#input\_generate\_administrator\_login\_password)
+
+Description: (Optional) When `true` and `administrator_login_password` is `null`, a random password is generated for the administrator login. The generated password can optionally be stored in Azure Key Vault by also setting `administrator_login_password_key_vault_configuration`. Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
@@ -709,6 +749,14 @@ Default: `null`
 ## Outputs
 
 The following outputs are exported:
+
+### <a name="output_administrator_login_password_key_vault_secret"></a> [administrator\_login\_password\_key\_vault\_secret](#output\_administrator\_login\_password\_key\_vault\_secret)
+
+Description: The Key Vault secret resource that stores the administrator login password. Only populated when `administrator_login_password_key_vault_configuration` is set.
+
+### <a name="output_generated_administrator_login_password"></a> [generated\_administrator\_login\_password](#output\_generated\_administrator\_login\_password)
+
+Description: The auto-generated administrator login password. Only populated when `generate_administrator_login_password = true`; null in all other cases (including when the password was supplied via `administrator_login_password` or `administrator_login_password_wo`). Sensitive.
 
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
