@@ -1,13 +1,13 @@
-output "administrator_login_password" {
-  description = "The administrator login password. This value is only populated when `generate_administrator_login_password` is `true` and `administrator_login_password` is `null`. Sensitive."
-  sensitive   = true
-  value       = try(random_password.administrator_login_password[0].result, null)
-}
-
 output "administrator_login_password_key_vault_secret" {
   description = "The Key Vault secret resource that stores the administrator login password. Only populated when `administrator_login_password_key_vault_configuration` is set."
   sensitive   = true
   value       = try(azurerm_key_vault_secret.administrator_login_password[0], null)
+}
+
+output "generated_administrator_login_password" {
+  description = "The auto-generated administrator login password. Only populated when `generate_administrator_login_password = true`; null in all other cases (including when the password was supplied via `administrator_login_password` or `administrator_login_password_wo`). Sensitive."
+  sensitive   = true
+  value       = try(random_password.administrator_login_password[0].result, null)
 }
 
 # In your output you need to select the correct resource based on the value of var.private_endpoints_manage_dns_zone_group:

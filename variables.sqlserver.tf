@@ -27,7 +27,13 @@ variable "administrator_login_password_key_vault_configuration" {
   })
   default     = null
   description = <<-EOT
-(Optional) When set, the administrator login password (whether provided via `administrator_login_password` or auto-generated via `generate_administrator_login_password`) is stored as a secret in the specified Azure Key Vault.
+(Optional) When set, the administrator login password is stored as a secret in the specified Azure Key Vault.
+
+**Supported password sources** (mutually exclusive):
+- `administrator_login_password` — an explicitly provided, readable password.
+- `generate_administrator_login_password = true` — a module-generated random password.
+
+**Not supported**: `administrator_login_password_wo`. Write-only values are not readable by Terraform after being applied and therefore cannot be stored in Key Vault. Setting this variable together with `administrator_login_password_wo` will raise a validation error.
 
 - `key_vault_resource_id` - (Required) The resource ID of the Key Vault in which to store the secret.
 - `secret_name`           - (Optional) The name of the Key Vault secret. Defaults to `"sql-administrator-login-password"`.

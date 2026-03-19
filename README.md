@@ -86,7 +86,13 @@ Default: `null`
 
 ### <a name="input_administrator_login_password_key_vault_configuration"></a> [administrator\_login\_password\_key\_vault\_configuration](#input\_administrator\_login\_password\_key\_vault\_configuration)
 
-Description: (Optional) When set, the administrator login password (whether provided via `administrator_login_password` or auto-generated via `generate_administrator_login_password`) is stored as a secret in the specified Azure Key Vault.
+Description: (Optional) When set, the administrator login password is stored as a secret in the specified Azure Key Vault.
+
+**Supported password sources** (mutually exclusive):
+- `administrator_login_password` — an explicitly provided, readable password.
+- `generate_administrator_login_password = true` — a module-generated random password.
+
+**Not supported**: `administrator_login_password_wo`. Write-only values are not readable by Terraform after being applied and therefore cannot be stored in Key Vault. Setting this variable together with `administrator_login_password_wo` will raise a validation error.
 
 - `key_vault_resource_id` - (Required) The resource ID of the Key Vault in which to store the secret.
 - `secret_name`           - (Optional) The name of the Key Vault secret. Defaults to `"sql-administrator-login-password"`.
@@ -744,13 +750,13 @@ Default: `null`
 
 The following outputs are exported:
 
-### <a name="output_administrator_login_password"></a> [administrator\_login\_password](#output\_administrator\_login\_password)
-
-Description: The administrator login password. This value is only populated when `generate_administrator_login_password` is `true` and `administrator_login_password` is `null`. Sensitive.
-
 ### <a name="output_administrator_login_password_key_vault_secret"></a> [administrator\_login\_password\_key\_vault\_secret](#output\_administrator\_login\_password\_key\_vault\_secret)
 
 Description: The Key Vault secret resource that stores the administrator login password. Only populated when `administrator_login_password_key_vault_configuration` is set.
+
+### <a name="output_generated_administrator_login_password"></a> [generated\_administrator\_login\_password](#output\_generated\_administrator\_login\_password)
+
+Description: The auto-generated administrator login password. Only populated when `generate_administrator_login_password = true`; null in all other cases (including when the password was supplied via `administrator_login_password` or `administrator_login_password_wo`). Sensitive.
 
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 

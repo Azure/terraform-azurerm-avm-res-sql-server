@@ -14,7 +14,7 @@ resource "random_password" "administrator_login_password" {
 }
 
 resource "azurerm_key_vault_secret" "administrator_login_password" {
-  count = var.administrator_login_password_key_vault_configuration != null ? 1 : 0
+  count = var.administrator_login_password_key_vault_configuration != null && local.administrator_login_password_effective != null ? 1 : 0
 
   key_vault_id    = var.administrator_login_password_key_vault_configuration.key_vault_resource_id
   name            = var.administrator_login_password_key_vault_configuration.secret_name
@@ -71,7 +71,15 @@ resource "azurerm_mssql_server" "this" {
       error_message = "The variables `administrator_login_password` and `generate_administrator_login_password` cannot be used together. Provide `administrator_login_password` OR set `generate_administrator_login_password = true`, not both."
     }
     precondition {
-      condition     = !(var.administrator_login_password_key_vault_configuration != null && local.administrator_login_password_effective == null)
+      condition     = !(var.administrator_login_password_wo != null && var.generate_administrator_login_password)
+      error_message = "The variables `administrator_login_password_wo` and `generate_administrator_login_password` cannot be used together. Provide `administrator_login_password_wo` OR set `generate_administrator_login_password = true`, not both."
+    }
+    precondition {
+      condition     = !(var.administrator_login_password_key_vault_configuration != null && var.administrator_login_password_wo != null)
+      error_message = "Key Vault storage is not supported when using `administrator_login_password_wo`: write-only values cannot be read back and therefore cannot be stored in Key Vault. Use `administrator_login_password` or set `generate_administrator_login_password = true` to store the password in Key Vault."
+    }
+    precondition {
+      condition     = !(var.administrator_login_password_key_vault_configuration != null && local.administrator_login_password_effective == null && var.administrator_login_password_wo == null)
       error_message = "Cannot store the administrator login password in Key Vault because no password is available. Either set `administrator_login_password` or set `generate_administrator_login_password = true`."
     }
   }
