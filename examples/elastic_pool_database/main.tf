@@ -54,7 +54,6 @@ locals {
       }
     }
   }
-
   elastic_pools = {
     # ── DTU-based ────────────────────────────────────────────────────────────
     basic_pool = {
@@ -66,9 +65,9 @@ locals {
         family   = null
       }
       per_database_settings = { min_capacity = 0, max_capacity = 5 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 9.7656
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 9.7656
     }
     standard_pool = {
       name = "standard_pool"
@@ -79,9 +78,9 @@ locals {
         family   = null
       }
       per_database_settings = { min_capacity = 0, max_capacity = 50 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
     premium_pool = {
       name = "premium_pool"
@@ -92,9 +91,9 @@ locals {
         family   = null
       }
       per_database_settings = { min_capacity = 0, max_capacity = 125 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
 
     # ── vCore — General Purpose ───────────────────────────────────────────────
@@ -107,9 +106,9 @@ locals {
         family   = "Gen4"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
     gp_gen5_pool = {
       name = "gp_gen5_pool"
@@ -120,9 +119,9 @@ locals {
         family   = "Gen5"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
     gp_fsv2_pool = {
       name = "gp_fsv2_pool"
@@ -133,9 +132,9 @@ locals {
         family   = "Fsv2"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
     gp_dc_pool = {
       name = "gp_dc_pool"
@@ -146,9 +145,9 @@ locals {
         family   = "DC"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
 
     # ── vCore — Business Critical ─────────────────────────────────────────────
@@ -161,9 +160,9 @@ locals {
         family   = "Gen4"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
     bc_gen5_pool = {
       name = "bc_gen5_pool"
@@ -174,9 +173,9 @@ locals {
         family   = "Gen5"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 4 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
     bc_dc_pool = {
       name = "bc_dc_pool"
@@ -187,9 +186,9 @@ locals {
         family   = "DC"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
-      max_size_gb            = 50
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
+      max_size_gb           = 50
     }
 
     # ── vCore — Hyperscale ────────────────────────────────────────────────────
@@ -202,8 +201,8 @@ locals {
         family   = "Gen5"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 4 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
     }
     hs_prms_pool = {
       name = "hs_prms_pool"
@@ -214,8 +213,8 @@ locals {
         family   = "PRMS"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 4 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
     }
     hs_moprms_pool = {
       name = "hs_moprms_pool"
@@ -226,8 +225,8 @@ locals {
         family   = "MOPRMS"
       }
       per_database_settings = { min_capacity = 0, max_capacity = 4 }
-      zone_redundant         = false
-      license_type           = "LicenseIncluded"
+      zone_redundant        = false
+      license_type          = "LicenseIncluded"
     }
   }
 }

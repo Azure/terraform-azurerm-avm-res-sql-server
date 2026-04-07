@@ -232,15 +232,18 @@ Description: The SKU configuration for the elastic pool. Choose one of the follo
 - BasicPool, StandardPool, or PremiumPool
 
 **vCore-based SKUs** (set family to the hardware generation):
-- General Purpose: GP\_Gen5\_*, GP\_Fsv2\_*, or GP\_DC\_*
-- Business Critical: BC\_Gen5\_* or BC\_DC\_*
-- Hyperscale: HS\_Gen5\_*, HS\_PRMS\_*, or HS\_MOPRMS\_*
+- General Purpose: GP\_Gen4, GP\_Gen5, GP\_Fsv2, or GP\_DC
+- Business Critical: BC\_Gen4, BC\_Gen5, or BC\_DC
+- Hyperscale: HS\_Gen5, HS\_PRMS, or HS\_MOPRMS
+
+Note: For elastic pools the SKU name does NOT include a capacity suffix (e.g. use "GP\_Gen5", not "GP\_Gen5\_8").  
+The capacity (vCores or DTUs) is set separately via the `capacity` property.
 
 Properties:
-- `name` - The SKU name (e.g., "PremiumPool", "GP\_Gen5\_8", "BC\_Gen5\_16")
+- `name` - The SKU name (e.g., "PremiumPool", "GP\_Gen5", "BC\_Gen5")
 - `capacity` - Number of DTUs or vCores
 - `tier` - Service tier (Basic, Standard, Premium, GeneralPurpose, BusinessCritical, or Hyperscale)
-- `family` - Hardware family (Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
+- `family` - Hardware family (Gen4, Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
 
 See: https://learn.microsoft.com/azure/azure-sql/database/resource-limits-vcore-elastic-pools
 
