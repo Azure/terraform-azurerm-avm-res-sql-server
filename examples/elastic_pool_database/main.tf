@@ -67,7 +67,7 @@ locals {
       per_database_settings = { min_capacity = 0, max_capacity = 5 }
       zone_redundant        = false
       license_type          = "LicenseIncluded"
-      max_size_gb           = 9.7656
+      max_size_gb           = 4.8828125 # BasicPool: 50 DTUs × 0.09765625 GB/DTU
     }
     standard_pool = {
       name = "standard_pool"
@@ -127,11 +127,11 @@ locals {
       name = "gp_fsv2_pool"
       sku = {
         name     = "GP_Fsv2"
-        capacity = 2
+        capacity = 8 # Fsv2 minimum valid capacity; valid: 8,10,12,14,16,18,20,24,32,36,72
         tier     = "GeneralPurpose"
         family   = "Fsv2"
       }
-      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      per_database_settings = { min_capacity = 0, max_capacity = 8 }
       zone_redundant        = false
       license_type          = "LicenseIncluded"
       max_size_gb           = 50
