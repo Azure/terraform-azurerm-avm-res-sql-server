@@ -26,7 +26,7 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  location = "AustraliaEast"
+  location = "eastus" # eastus supports Gen5, Fsv2, DC-series, and all Hyperscale hardware
   name     = module.naming.resource_group.name_unique
 }
 
@@ -97,19 +97,7 @@ locals {
     }
 
     # ── vCore — General Purpose ───────────────────────────────────────────────
-    gp_gen4_pool = {
-      name = "gp_gen4_pool"
-      sku = {
-        name     = "GP_Gen4"
-        capacity = 2
-        tier     = "GeneralPurpose"
-        family   = "Gen4"
-      }
-      per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant        = false
-      license_type          = "LicenseIncluded"
-      max_size_gb           = 50
-    }
+    # Note: GP_Gen4 is omitted — Gen4 hardware is fully retired and cannot be provisioned.
     gp_gen5_pool = {
       name = "gp_gen5_pool"
       sku = {
@@ -151,19 +139,7 @@ locals {
     }
 
     # ── vCore — Business Critical ─────────────────────────────────────────────
-    bc_gen4_pool = {
-      name = "bc_gen4_pool"
-      sku = {
-        name     = "BC_Gen4"
-        capacity = 2
-        tier     = "BusinessCritical"
-        family   = "Gen4"
-      }
-      per_database_settings = { min_capacity = 0, max_capacity = 2 }
-      zone_redundant        = false
-      license_type          = "LicenseIncluded"
-      max_size_gb           = 50
-    }
+    # Note: BC_Gen4 is omitted — Gen4 hardware is fully retired and cannot be provisioned.
     bc_gen5_pool = {
       name = "bc_gen5_pool"
       sku = {

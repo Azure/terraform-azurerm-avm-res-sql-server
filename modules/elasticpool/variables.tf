@@ -207,18 +207,18 @@ The SKU configuration for the elastic pool. Choose one of the following:
 - BasicPool, StandardPool, or PremiumPool
 
 **vCore-based SKUs** (set family to the hardware generation):
-- General Purpose: GP_Gen4, GP_Gen5, GP_Fsv2, or GP_DC
-- Business Critical: BC_Gen4, BC_Gen5, or BC_DC
+- General Purpose: GP_Gen5, GP_Fsv2, or GP_DC
+- Business Critical: BC_Gen5 or BC_DC
 - Hyperscale: HS_Gen5, HS_PRMS, or HS_MOPRMS
 
-Note: For elastic pools the SKU name does NOT include a capacity suffix (e.g. use "GP_Gen5", not "GP_Gen5_8").
-The capacity (vCores or DTUs) is set separately via the `capacity` property.
+Note: Gen4 hardware (GP_Gen4, BC_Gen4) has been fully retired and cannot be provisioned.
 
 Properties:
 - `name` - The SKU name (e.g., "PremiumPool", "GP_Gen5", "BC_Gen5")
 - `capacity` - Number of DTUs or vCores
 - `tier` - Service tier (Basic, Standard, Premium, GeneralPurpose, BusinessCritical, or Hyperscale)
-- `family` - Hardware family (Gen4, Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
+- `family` - Hardware family (Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
+- Note: For elastic pools the SKU name does NOT include a capacity suffix (e.g. use "GP_Gen5", not "GP_Gen5_8"). The capacity (vCores or DTUs) is specified separately via the `capacity` property.
 
 See: https://learn.microsoft.com/azure/azure-sql/database/resource-limits-vcore-elastic-pools
 DESCRIPTION
@@ -231,12 +231,10 @@ DESCRIPTION
       (var.sku.name == "StandardPool" && var.sku.tier == "Standard" && var.sku.family == null) ||
       (var.sku.name == "PremiumPool" && var.sku.tier == "Premium" && var.sku.family == null) ||
       # vCore-based General Purpose: exact name/family pairs
-      (var.sku.name == "GP_Gen4" && var.sku.tier == "GeneralPurpose" && var.sku.family == "Gen4") ||
       (var.sku.name == "GP_Gen5" && var.sku.tier == "GeneralPurpose" && var.sku.family == "Gen5") ||
       (var.sku.name == "GP_Fsv2" && var.sku.tier == "GeneralPurpose" && var.sku.family == "Fsv2") ||
       (var.sku.name == "GP_DC" && var.sku.tier == "GeneralPurpose" && var.sku.family == "DC") ||
       # vCore-based Business Critical: exact name/family pairs
-      (var.sku.name == "BC_Gen4" && var.sku.tier == "BusinessCritical" && var.sku.family == "Gen4") ||
       (var.sku.name == "BC_Gen5" && var.sku.tier == "BusinessCritical" && var.sku.family == "Gen5") ||
       (var.sku.name == "BC_DC" && var.sku.tier == "BusinessCritical" && var.sku.family == "DC") ||
       # vCore-based Hyperscale: exact name/family pairs
@@ -251,12 +249,10 @@ DESCRIPTION
         - name="StandardPool", tier="Standard"
         - name="PremiumPool",  tier="Premium"
       vCore General Purpose (tier="GeneralPurpose"):
-        - name="GP_Gen4",  family="Gen4"
         - name="GP_Gen5",  family="Gen5"
         - name="GP_Fsv2",  family="Fsv2"
         - name="GP_DC",    family="DC"
       vCore Business Critical (tier="BusinessCritical"):
-        - name="BC_Gen4",  family="Gen4"
         - name="BC_Gen5",  family="Gen5"
         - name="BC_DC",    family="DC"
       vCore Hyperscale (tier="Hyperscale"):
