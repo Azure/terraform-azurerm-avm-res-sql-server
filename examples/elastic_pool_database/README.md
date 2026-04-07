@@ -55,11 +55,10 @@ locals {
       license_type     = "LicenseIncluded"
       sku_name         = "ElasticPool"
 
-      short_term_retention_policy = {
-        retention_days = 1
-        # Hyperscale does not support backup_interval_in_hours; Azure always returns 0 for it.
-        # Using 0 here avoids idempotency failures on the second plan.
-        backup_interval_in_hours = v.sku.tier == "Hyperscale" ? 0 : 24
+      # Hyperscale does not support short_term_retention_policy; omit the block entirely.
+      short_term_retention_policy = v.sku.tier == "Hyperscale" ? null : {
+        retention_days           = 1
+        backup_interval_in_hours = 24
       }
     }
   }
