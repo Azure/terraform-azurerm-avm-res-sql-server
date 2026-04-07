@@ -37,14 +37,15 @@ resource "random_password" "admin_password" {
 }
 
 locals {
+  # One database per elastic pool — each exercises a different SKU combination
+  # for validation coverage of the modified elastic pool SKU variable.
   databases = {
-    sample_database = {
-      name             = "sample_database"
+    for k, v in local.elastic_pools : "db_${k}" => {
+      name             = "db-${replace(v.name, "_", "-")}"
       create_mode      = "Default"
       collation        = "SQL_Latin1_General_CP1_CI_AS"
-      elastic_pool_key = "sample_pool"
+      elastic_pool_key = k
       license_type     = "LicenseIncluded"
-      max_size_gb      = 50
       sku_name         = "ElasticPool"
 
       short_term_retention_policy = {
@@ -53,22 +54,180 @@ locals {
       }
     }
   }
+
   elastic_pools = {
-    sample_pool = {
-      name = "sample_pool"
+    # ── DTU-based ────────────────────────────────────────────────────────────
+    basic_pool = {
+      name = "basic_pool"
+      sku = {
+        name     = "BasicPool"
+        capacity = 50
+        tier     = "Basic"
+        family   = null
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 5 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 9.7656
+    }
+    standard_pool = {
+      name = "standard_pool"
       sku = {
         name     = "StandardPool"
         capacity = 50
         tier     = "Standard"
+        family   = null
       }
-      per_database_settings = {
-        min_capacity = 50
-        max_capacity = 50
+      per_database_settings = { min_capacity = 0, max_capacity = 50 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+    premium_pool = {
+      name = "premium_pool"
+      sku = {
+        name     = "PremiumPool"
+        capacity = 125
+        tier     = "Premium"
+        family   = null
       }
-      maintenance_configuration_name = "SQL_Default"
-      zone_redundant                 = false
-      license_type                   = "LicenseIncluded"
-      max_size_gb                    = 50
+      per_database_settings = { min_capacity = 0, max_capacity = 125 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+
+    # ── vCore — General Purpose ───────────────────────────────────────────────
+    gp_gen4_pool = {
+      name = "gp_gen4_pool"
+      sku = {
+        name     = "GP_Gen4"
+        capacity = 2
+        tier     = "GeneralPurpose"
+        family   = "Gen4"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+    gp_gen5_pool = {
+      name = "gp_gen5_pool"
+      sku = {
+        name     = "GP_Gen5"
+        capacity = 2
+        tier     = "GeneralPurpose"
+        family   = "Gen5"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+    gp_fsv2_pool = {
+      name = "gp_fsv2_pool"
+      sku = {
+        name     = "GP_Fsv2"
+        capacity = 2
+        tier     = "GeneralPurpose"
+        family   = "Fsv2"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+    gp_dc_pool = {
+      name = "gp_dc_pool"
+      sku = {
+        name     = "GP_DC"
+        capacity = 2
+        tier     = "GeneralPurpose"
+        family   = "DC"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+
+    # ── vCore — Business Critical ─────────────────────────────────────────────
+    bc_gen4_pool = {
+      name = "bc_gen4_pool"
+      sku = {
+        name     = "BC_Gen4"
+        capacity = 2
+        tier     = "BusinessCritical"
+        family   = "Gen4"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+    bc_gen5_pool = {
+      name = "bc_gen5_pool"
+      sku = {
+        name     = "BC_Gen5"
+        capacity = 4
+        tier     = "BusinessCritical"
+        family   = "Gen5"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 4 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+    bc_dc_pool = {
+      name = "bc_dc_pool"
+      sku = {
+        name     = "BC_DC"
+        capacity = 2
+        tier     = "BusinessCritical"
+        family   = "DC"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 2 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+      max_size_gb            = 50
+    }
+
+    # ── vCore — Hyperscale ────────────────────────────────────────────────────
+    hs_gen5_pool = {
+      name = "hs_gen5_pool"
+      sku = {
+        name     = "HS_Gen5"
+        capacity = 4
+        tier     = "Hyperscale"
+        family   = "Gen5"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 4 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+    }
+    hs_prms_pool = {
+      name = "hs_prms_pool"
+      sku = {
+        name     = "HS_PRMS"
+        capacity = 4
+        tier     = "Hyperscale"
+        family   = "PRMS"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 4 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
+    }
+    hs_moprms_pool = {
+      name = "hs_moprms_pool"
+      sku = {
+        name     = "HS_MOPRMS"
+        capacity = 4
+        tier     = "Hyperscale"
+        family   = "MOPRMS"
+      }
+      per_database_settings = { min_capacity = 0, max_capacity = 4 }
+      zone_redundant         = false
+      license_type           = "LicenseIncluded"
     }
   }
 }
