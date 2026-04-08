@@ -207,15 +207,18 @@ The SKU configuration for the elastic pool. Choose one of the following:
 - BasicPool, StandardPool, or PremiumPool
 
 **vCore-based SKUs** (set family to the hardware generation):
-- General Purpose: GP_Gen5_*, GP_Fsv2_*, or GP_DC_*
-- Business Critical: BC_Gen5_* or BC_DC_*
-- Hyperscale: HS_Gen5_*, HS_PRMS_*, or HS_MOPRMS_*
+- General Purpose: GP_Gen5, GP_Fsv2, or GP_DC
+- Business Critical: BC_Gen5 or BC_DC
+- Hyperscale: HS_Gen5, HS_PRMS, or HS_MOPRMS
+
+Note: Gen4 hardware (GP_Gen4, BC_Gen4) has been fully retired and cannot be provisioned.
 
 Properties:
-- `name` - The SKU name (e.g., "PremiumPool", "GP_Gen5_8", "BC_Gen5_16")
+- `name` - The SKU name (e.g., "PremiumPool", "GP_Gen5", "BC_Gen5")
 - `capacity` - Number of DTUs or vCores
 - `tier` - Service tier (Basic, Standard, Premium, GeneralPurpose, BusinessCritical, or Hyperscale)
 - `family` - Hardware family (Gen5, Fsv2, DC, PRMS, MOPRMS) - required for vCore SKUs, null for DTU SKUs
+- Note: For elastic pools the SKU name does NOT include a capacity suffix (e.g. use "GP_Gen5", not "GP_Gen5_8"). The capacity (vCores or DTUs) is specified separately via the `capacity` property.
 
 See: https://learn.microsoft.com/azure/azure-sql/database/resource-limits-vcore-elastic-pools
 DESCRIPTION
@@ -227,20 +230,17 @@ DESCRIPTION
       (var.sku.name == "BasicPool" && var.sku.tier == "Basic" && var.sku.family == null) ||
       (var.sku.name == "StandardPool" && var.sku.tier == "Standard" && var.sku.family == null) ||
       (var.sku.name == "PremiumPool" && var.sku.tier == "Premium" && var.sku.family == null) ||
-      # vCore-based General Purpose: family must match name prefix
-      (startswith(var.sku.name, "GP_") && var.sku.tier == "GeneralPurpose" &&
-        ((startswith(var.sku.name, "GP_Gen5_") && var.sku.family == "Gen5") ||
-          (startswith(var.sku.name, "GP_Fsv2_") && var.sku.family == "Fsv2") ||
-      (startswith(var.sku.name, "GP_DC_") && var.sku.family == "DC"))) ||
-      # vCore-based Business Critical: family must match name prefix
-      (startswith(var.sku.name, "BC_") && var.sku.tier == "BusinessCritical" &&
-        ((startswith(var.sku.name, "BC_Gen5_") && var.sku.family == "Gen5") ||
-      (startswith(var.sku.name, "BC_DC_") && var.sku.family == "DC"))) ||
-      # vCore-based Hyperscale: family must match name prefix
-      (startswith(var.sku.name, "HS_") && var.sku.tier == "Hyperscale" &&
-        ((startswith(var.sku.name, "HS_Gen5_") && var.sku.family == "Gen5") ||
-          (startswith(var.sku.name, "HS_PRMS_") && var.sku.family == "PRMS") ||
-      (startswith(var.sku.name, "HS_MOPRMS_") && var.sku.family == "MOPRMS")))
+      # vCore-based General Purpose: exact name/family pairs
+      (var.sku.name == "GP_Gen5" && var.sku.tier == "GeneralPurpose" && var.sku.family == "Gen5") ||
+      (var.sku.name == "GP_Fsv2" && var.sku.tier == "GeneralPurpose" && var.sku.family == "Fsv2") ||
+      (var.sku.name == "GP_DC" && var.sku.tier == "GeneralPurpose" && var.sku.family == "DC") ||
+      # vCore-based Business Critical: exact name/family pairs
+      (var.sku.name == "BC_Gen5" && var.sku.tier == "BusinessCritical" && var.sku.family == "Gen5") ||
+      (var.sku.name == "BC_DC" && var.sku.tier == "BusinessCritical" && var.sku.family == "DC") ||
+      # vCore-based Hyperscale: exact name/family pairs
+      (var.sku.name == "HS_Gen5" && var.sku.tier == "Hyperscale" && var.sku.family == "Gen5") ||
+      (var.sku.name == "HS_PRMS" && var.sku.tier == "Hyperscale" && var.sku.family == "PRMS") ||
+      (var.sku.name == "HS_MOPRMS" && var.sku.tier == "Hyperscale" && var.sku.family == "MOPRMS")
     )
     error_message = <<-EOT
       Invalid SKU configuration. Valid combinations are:
@@ -249,16 +249,16 @@ DESCRIPTION
         - name="StandardPool", tier="Standard"
         - name="PremiumPool",  tier="Premium"
       vCore General Purpose (tier="GeneralPurpose"):
-        - name prefix "GP_Gen5_",  family="Gen5"
-        - name prefix "GP_Fsv2_",  family="Fsv2"
-        - name prefix "GP_DC_",    family="DC"
+        - name="GP_Gen5",  family="Gen5"
+        - name="GP_Fsv2",  family="Fsv2"
+        - name="GP_DC",    family="DC"
       vCore Business Critical (tier="BusinessCritical"):
-        - name prefix "BC_Gen5_",  family="Gen5"
-        - name prefix "BC_DC_",    family="DC"
+        - name="BC_Gen5",  family="Gen5"
+        - name="BC_DC",    family="DC"
       vCore Hyperscale (tier="Hyperscale"):
-        - name prefix "HS_Gen5_",    family="Gen5"
-        - name prefix "HS_PRMS_",    family="PRMS"
-        - name prefix "HS_MOPRMS_",  family="MOPRMS"
+        - name="HS_Gen5",    family="Gen5"
+        - name="HS_PRMS",    family="PRMS"
+        - name="HS_MOPRMS",  family="MOPRMS"
     EOT
   }
 }
