@@ -217,19 +217,19 @@ Default: `null`
 
 Description: Controls the Long Term Retention Policy configuration on this resource. The following properties can be specified:
 
-- `weekly_retention` - (Required) Specifies the weekly retention policy.
-- `monthly_retention` - (Required) Specifies the monthly retention policy.
-- `yearly_retention` - (Required) Specifies the yearly retention policy.
-- `week_of_year` - (Required) Specifies the week of the year to apply the yearly retention policy.
+- `weekly_retention` - (Optional) Specifies the weekly retention policy.
+- `monthly_retention` - (Optional) Specifies the monthly retention policy.
+- `yearly_retention` - (Optional) Specifies the yearly retention policy.
+- `week_of_year` - (Optional) Specifies the week of the year to apply the yearly retention policy.
 
 Type:
 
 ```hcl
 object({
-    weekly_retention  = string
-    monthly_retention = string
-    yearly_retention  = string
-    week_of_year      = number
+    weekly_retention  = optional(string)
+    monthly_retention = optional(string)
+    yearly_retention  = optional(string)
+    week_of_year      = optional(number)
   })
 ```
 
