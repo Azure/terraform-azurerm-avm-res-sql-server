@@ -119,19 +119,6 @@ locals {
       license_type          = "LicenseIncluded"
       max_size_gb           = 50
     }
-    gp_prms_pool = {
-      name = "gp_prms_pool"
-      sku = {
-        name     = "GP_PRMS"
-        capacity = 4
-        tier     = "GeneralPurpose"
-        family   = "PRMS"
-      }
-      per_database_settings = { min_capacity = 0, max_capacity = 4 }
-      zone_redundant        = false
-      license_type          = "LicenseIncluded"
-      max_size_gb           = 50
-    }
     gp_dc_pool = {
       name = "gp_dc_pool"
       sku = {
