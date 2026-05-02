@@ -112,15 +112,15 @@ locals {
       license_type          = "LicenseIncluded"
       max_size_gb           = 50
     }
-    gp_fsv2_pool = {
-      name = "gp_fsv2_pool"
+    gp_prms_pool = {
+      name = "gp_prms_pool"
       sku = {
-        name     = "GP_Fsv2"
-        capacity = 8 # Fsv2 minimum valid capacity; valid: 8,10,12,14,16,18,20,24,32,36,72
+        name     = "GP_PRMS"
+        capacity = 4
         tier     = "GeneralPurpose"
-        family   = "Fsv2"
+        family   = "PRMS"
       }
-      per_database_settings = { min_capacity = 0, max_capacity = 8 }
+      per_database_settings = { min_capacity = 0, max_capacity = 4 }
       zone_redundant        = false
       license_type          = "LicenseIncluded"
       max_size_gb           = 50
