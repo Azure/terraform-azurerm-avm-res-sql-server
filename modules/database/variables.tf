@@ -152,20 +152,35 @@ variable "lock" {
 
 variable "long_term_retention_policy" {
   type = object({
-    weekly_retention  = string
-    monthly_retention = string
-    yearly_retention  = string
-    week_of_year      = number
+    weekly_retention  = optional(string)
+    monthly_retention = optional(string)
+    yearly_retention  = optional(string)
+    week_of_year      = optional(number)
   })
   default     = null
   description = <<DESCRIPTION
-Controls the Long Term Retention Policy configuration on this resource. The following properties can be specified:
+Controls the Long Term Retention Policy configuration on this resource. At least one of `weekly_retention`, `monthly_retention`, or `yearly_retention` must be specified. The following properties can be specified:
 
-- `weekly_retention` - (Required) Specifies the weekly retention policy.
-- `monthly_retention` - (Required) Specifies the monthly retention policy.
-- `yearly_retention` - (Required) Specifies the yearly retention policy.
-- `week_of_year` - (Required) Specifies the week of the year to apply the yearly retention policy.
+- `weekly_retention` - (Optional) The weekly retention policy in ISO 8601 duration format (e.g., `"P1W"` for 1 week, `"P4W"` for 4 weeks).
+- `monthly_retention` - (Optional) The monthly retention policy in ISO 8601 duration format (e.g., `"P1M"` for 1 month, `"P12M"` for 12 months).
+- `yearly_retention` - (Optional) The yearly retention policy in ISO 8601 duration format (e.g., `"P1Y"` for 1 year, `"P5Y"` for 5 years).
+- `week_of_year` - (Optional) The week of the year (1-52) to take the yearly backup. Required if `yearly_retention` is set.
 DESCRIPTION
+
+  validation {
+    condition = var.long_term_retention_policy == null ? true : (
+      var.long_term_retention_policy.weekly_retention != null ||
+      var.long_term_retention_policy.monthly_retention != null ||
+      var.long_term_retention_policy.yearly_retention != null
+    )
+    error_message = "At least one of `weekly_retention`, `monthly_retention`, or `yearly_retention` must be specified when `long_term_retention_policy` is set."
+  }
+  validation {
+    condition = var.long_term_retention_policy == null ? true : (
+      var.long_term_retention_policy.yearly_retention == null || var.long_term_retention_policy.week_of_year != null
+    )
+    error_message = "`week_of_year` must be specified when `yearly_retention` is set."
+  }
 }
 
 variable "maintenance_configuration_name" {

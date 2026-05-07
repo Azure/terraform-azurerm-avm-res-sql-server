@@ -54,6 +54,14 @@ resource "random_password" "admin_password" {
   special          = true
 }
 
+resource "random_string" "kv_suffix" {
+  length  = 4
+  lower   = true
+  numeric = true
+  special = false
+  upper   = false
+}
+
 # User-assigned managed identity for SQL Server CMK TDE
 resource "azurerm_user_assigned_identity" "this" {
   location            = azurerm_resource_group.this.location
@@ -64,7 +72,7 @@ resource "azurerm_user_assigned_identity" "this" {
 # Key Vault for CMK TDE
 resource "azurerm_key_vault" "this" {
   location                   = azurerm_resource_group.this.location
-  name                       = module.naming.key_vault.name_unique
+  name                       = "${module.naming.key_vault.name_unique}${random_string.kv_suffix.result}"
   resource_group_name        = azurerm_resource_group.this.name
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -170,6 +178,7 @@ The following resources are used by this module:
 - [azurerm_role_assignment.sql_kv_crypto](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [random_password.admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
+- [random_string.kv_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->

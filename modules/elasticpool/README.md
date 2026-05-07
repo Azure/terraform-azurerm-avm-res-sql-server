@@ -232,11 +232,16 @@ Description: The SKU configuration for the elastic pool. Choose one of the follo
 - BasicPool, StandardPool, or PremiumPool
 
 **vCore-based SKUs** (set family to the hardware generation):
-- General Purpose: GP\_Gen5, GP\_Fsv2, or GP\_DC
+- General Purpose: GP\_Gen5, GP\_Fsv2 (deprecated), or GP\_DC
 - Business Critical: BC\_Gen5 or BC\_DC
 - Hyperscale: HS\_Gen5, HS\_PRMS, or HS\_MOPRMS
 
 Note: Gen4 hardware (GP\_Gen4, BC\_Gen4) has been fully retired and cannot be provisioned.
+
+Deprecation notice: The Fsv2 series (GP\_Fsv2) has been deprecated by Azure SQL.  
+While still accepted by this module's schema for backwards compatibility, new  
+elastic pools using GP\_Fsv2 can no longer be created at the Azure platform  
+level and will fail at apply time. Use GP\_Gen5 or GP\_DC instead.
 
 Properties:
 - `name` - The SKU name (e.g., "PremiumPool", "GP\_Gen5", "BC\_Gen5")
