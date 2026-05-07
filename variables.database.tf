@@ -35,10 +35,10 @@ variable "databases" {
     }))
 
     long_term_retention_policy = optional(object({
-      weekly_retention  = string
-      monthly_retention = string
-      yearly_retention  = string
-      week_of_year      = number
+      weekly_retention  = optional(string)
+      monthly_retention = optional(string)
+      yearly_retention  = optional(string)
+      week_of_year      = optional(number)
     }))
 
     short_term_retention_policy = optional(object({
