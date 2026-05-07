@@ -215,12 +215,12 @@ Default: `null`
 
 ### <a name="input_long_term_retention_policy"></a> [long\_term\_retention\_policy](#input\_long\_term\_retention\_policy)
 
-Description: Controls the Long Term Retention Policy configuration on this resource. The following properties can be specified:
+Description: Controls the Long Term Retention Policy configuration on this resource. At least one of `weekly_retention`, `monthly_retention`, or `yearly_retention` must be specified. The following properties can be specified:
 
-- `weekly_retention` - (Optional) Specifies the weekly retention policy.
-- `monthly_retention` - (Optional) Specifies the monthly retention policy.
-- `yearly_retention` - (Optional) Specifies the yearly retention policy.
-- `week_of_year` - (Optional) Specifies the week of the year to apply the yearly retention policy.
+- `weekly_retention` - (Optional) The weekly retention policy in ISO 8601 duration format (e.g., `"P1W"` for 1 week, `"P4W"` for 4 weeks).
+- `monthly_retention` - (Optional) The monthly retention policy in ISO 8601 duration format (e.g., `"P1M"` for 1 month, `"P12M"` for 12 months).
+- `yearly_retention` - (Optional) The yearly retention policy in ISO 8601 duration format (e.g., `"P1Y"` for 1 year, `"P5Y"` for 5 years).
+- `week_of_year` - (Optional) The week of the year (1-52) to take the yearly backup. Required if `yearly_retention` is set.
 
 Type:
 
