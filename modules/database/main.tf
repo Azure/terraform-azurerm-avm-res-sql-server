@@ -4,6 +4,7 @@ resource "azurerm_mssql_database" "this" {
   auto_pause_delay_in_minutes                                = var.auto_pause_delay_in_minutes
   collation                                                  = var.collation
   create_mode                                                = var.import == null ? var.create_mode : null
+  creation_source_database_id                                = var.creation_source_database_id
   elastic_pool_id                                            = var.elastic_pool_id
   geo_backup_enabled                                         = var.geo_backup_enabled
   ledger_enabled                                             = var.ledger_enabled
@@ -82,6 +83,10 @@ resource "azurerm_mssql_database" "this" {
     precondition {
       condition     = var.elastic_pool_id == null || (var.elastic_pool_id != null && var.maintenance_configuration_name == null)
       error_message = "When creating a database resource with an elastic_pool_id, the maintenance_configuration_name is not supported at the database scope. Set this on the elastic pool instead."
+    }
+    precondition {
+      condition     = !contains(["Copy", "OnlineSecondary", "PointInTimeRestore", "Recovery", "Restore", "RestoreExternalBackup", "RestoreExternalBackupSecondary", "RestoreLongTermRetentionBackup", "Secondary"], var.create_mode) || var.creation_source_database_id != null
+      error_message = "'creation_source_database_id' must be set when 'create_mode' is not 'Default'."
     }
   }
 }

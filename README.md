@@ -266,6 +266,7 @@ map(object({
     name                                                       = string
     auto_pause_delay_in_minutes                                = optional(number)
     create_mode                                                = optional(string, "Default")
+    creation_source_database_id                                = optional(string)
     collation                                                  = optional(string)
     elastic_pool_key                                           = optional(string)
     geo_backup_enabled                                         = optional(bool, true)

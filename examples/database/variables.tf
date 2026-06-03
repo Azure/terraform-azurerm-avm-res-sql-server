@@ -1,3 +1,13 @@
+variable "creation_source_database_id" {
+  type        = string
+  description = "The resource ID of the source database for the point in time restore."
+}
+
+variable "restore_point_in_time" {
+  type        = string
+  description = "The point in time (ISO8601 format) to restore the database from. Required for PointInTimeRestore create mode."
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true

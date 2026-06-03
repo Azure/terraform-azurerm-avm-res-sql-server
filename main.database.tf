@@ -7,6 +7,7 @@ module "database" {
   auto_pause_delay_in_minutes                                = each.value.auto_pause_delay_in_minutes
   collation                                                  = each.value.collation
   create_mode                                                = each.value.create_mode
+  creation_source_database_id                                = each.value.creation_source_database_id
   diagnostic_settings                                        = each.value.diagnostic_settings
   elastic_pool_id                                            = each.value.elastic_pool_key != null ? module.elasticpool[each.value.elastic_pool_key].resource_id : null
   geo_backup_enabled                                         = each.value.geo_backup_enabled

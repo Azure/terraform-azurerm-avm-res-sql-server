@@ -57,6 +57,16 @@ locals {
 
       tags = local.tags
     }
+    my_sample_db_restore = {
+      name                        = "my_sample_db_restore"
+      create_mode                 = "PointInTimeRestore"
+      creation_source_database_id = var.creation_source_database_id
+      restore_point_in_time       = var.restore_point_in_time
+      sku_name                    = "S0"
+      max_size_gb                 = 50
+
+      tags = local.tags
+    }
   }
   tags = {
     environment = "sample"

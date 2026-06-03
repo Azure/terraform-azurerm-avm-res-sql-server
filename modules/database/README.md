@@ -101,6 +101,14 @@ Type: `string`
 
 Default: `"Default"`
 
+### <a name="input_creation_source_database_id"></a> [creation\_source\_database\_id](#input\_creation\_source\_database\_id)
+
+Description: The ID of the source database from which to create the new database. This should only be used for database create modes other than `Default`.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description:   A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.

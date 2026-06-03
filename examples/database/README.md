@@ -64,6 +64,16 @@ locals {
 
       tags = local.tags
     }
+    my_sample_db_restore = {
+      name                        = "my_sample_db_restore"
+      create_mode                 = "PointInTimeRestore"
+      creation_source_database_id = var.creation_source_database_id
+      restore_point_in_time       = var.restore_point_in_time
+      sku_name                    = "S0"
+      max_size_gb                 = 50
+
+      tags = local.tags
+    }
   }
   tags = {
     environment = "sample"
@@ -108,7 +118,19 @@ The following resources are used by this module:
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_creation_source_database_id"></a> [creation\_source\_database\_id](#input\_creation\_source\_database\_id)
+
+Description: The resource ID of the source database for the point in time restore.
+
+Type: `string`
+
+### <a name="input_restore_point_in_time"></a> [restore\_point\_in\_time](#input\_restore\_point\_in\_time)
+
+Description: The point in time (ISO8601 format) to restore the database from. Required for PointInTimeRestore create mode.
+
+Type: `string`
 
 ## Optional Inputs
 
