@@ -37,37 +37,41 @@ resource "random_password" "admin_password" {
 }
 
 locals {
-  databases = {
-    my_sample_db = {
-      name         = "my_sample_db"
-      create_mode  = "Default"
-      collation    = "SQL_Latin1_General_CP1_CI_AS"
-      license_type = "LicenseIncluded"
-      max_size_gb  = 50
-      sku_name     = "S0"
+  databases = merge(
+    {
+      my_sample_db = {
+        name         = "my_sample_db"
+        create_mode  = "Default"
+        collation    = "SQL_Latin1_General_CP1_CI_AS"
+        license_type = "LicenseIncluded"
+        max_size_gb  = 50
+        sku_name     = "S0"
 
-      short_term_retention_policy = {
-        retention_days           = 1
-        backup_interval_in_hours = 24
+        short_term_retention_policy = {
+          retention_days           = 1
+          backup_interval_in_hours = 24
+        }
+
+        long_term_retention_policy = {
+          weekly_retention = "P2W1D"
+        }
+
+        tags = local.tags
       }
+    },
+    var.creation_source_database_id != null ? {
+      my_sample_db_restore = {
+        name                        = "my_sample_db_restore"
+        create_mode                 = "PointInTimeRestore"
+        creation_source_database_id = var.creation_source_database_id
+        restore_point_in_time       = var.restore_point_in_time
+        sku_name                    = "S0"
+        max_size_gb                 = 50
 
-      long_term_retention_policy = {
-        weekly_retention = "P2W1D"
+        tags = local.tags
       }
-
-      tags = local.tags
-    }
-    my_sample_db_restore = {
-      name                        = "my_sample_db_restore"
-      create_mode                 = "PointInTimeRestore"
-      creation_source_database_id = var.creation_source_database_id
-      restore_point_in_time       = var.restore_point_in_time
-      sku_name                    = "S0"
-      max_size_gb                 = 50
-
-      tags = local.tags
-    }
-  }
+    } : {}
+  )
   tags = {
     environment = "sample"
     cost_centre = "demo"
