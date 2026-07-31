@@ -44,27 +44,41 @@ resource "random_password" "admin_password" {
 }
 
 locals {
-  databases = {
-    my_sample_db = {
-      name         = "my_sample_db"
-      create_mode  = "Default"
-      collation    = "SQL_Latin1_General_CP1_CI_AS"
-      license_type = "LicenseIncluded"
-      max_size_gb  = 50
-      sku_name     = "S0"
+  databases = merge(
+    {
+      my_sample_db = {
+        name         = "my_sample_db"
+        create_mode  = "Default"
+        collation    = "SQL_Latin1_General_CP1_CI_AS"
+        license_type = "LicenseIncluded"
+        max_size_gb  = 50
+        sku_name     = "S0"
 
-      short_term_retention_policy = {
-        retention_days           = 1
-        backup_interval_in_hours = 24
+        short_term_retention_policy = {
+          retention_days           = 1
+          backup_interval_in_hours = 24
+        }
+
+        long_term_retention_policy = {
+          weekly_retention = "P2W1D"
+        }
+
+        tags = local.tags
       }
+    },
+    var.creation_source_database_id != null ? {
+      my_sample_db_restore = {
+        name                        = "my_sample_db_restore"
+        create_mode                 = "PointInTimeRestore"
+        creation_source_database_id = var.creation_source_database_id
+        restore_point_in_time       = var.restore_point_in_time
+        sku_name                    = "S0"
+        max_size_gb                 = 50
 
-      long_term_retention_policy = {
-        weekly_retention = "P2W1D"
+        tags = local.tags
       }
-
-      tags = local.tags
-    }
-  }
+    } : {}
+  )
   tags = {
     environment = "sample"
     cost_centre = "demo"
@@ -114,6 +128,14 @@ No required inputs.
 
 The following input variables are optional (have default values):
 
+### <a name="input_creation_source_database_id"></a> [creation\_source\_database\_id](#input\_creation\_source\_database\_id)
+
+Description: The resource ID of the source database for the point in time restore.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: This variable controls whether or not telemetry is enabled for the module.  
@@ -123,6 +145,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_restore_point_in_time"></a> [restore\_point\_in\_time](#input\_restore\_point\_in\_time)
+
+Description: The point in time (ISO8601 format) to restore the database from. Required for PointInTimeRestore create mode.
+
+Type: `string`
+
+Default: `null`
 
 ## Outputs
 
