@@ -98,8 +98,6 @@ module "sql_server" {
 
   depends_on = [time_sleep.rbac_propagation]
 }
-
-
 ```
 
 <!-- markdownlint-disable MD033 -->
