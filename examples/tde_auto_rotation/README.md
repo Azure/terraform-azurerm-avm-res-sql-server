@@ -144,7 +144,7 @@ module "sql_server" {
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
   databases                    = local.databases
-  enable_telemetry             = var.enable_telemetry
+  enable_telemetry             = false
   managed_identities = {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
   }

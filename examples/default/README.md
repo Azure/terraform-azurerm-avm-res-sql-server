@@ -51,7 +51,7 @@ module "sql_server" {
   server_version               = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-  enable_telemetry             = var.enable_telemetry
+  enable_telemetry             = false
   name                         = module.naming.sql_server.name_unique
 }
 ```
