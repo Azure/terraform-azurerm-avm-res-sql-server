@@ -51,7 +51,7 @@ module "sql_server" {
   server_version               = "12.0"
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
-  enable_telemetry             = false
+  enable_telemetry             = var.enable_telemetry
   name                         = module.naming.sql_server.name_unique
 }
 ```
@@ -91,7 +91,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 

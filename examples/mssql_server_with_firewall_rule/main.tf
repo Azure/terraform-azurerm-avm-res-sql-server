@@ -46,7 +46,7 @@ module "sql_server_with_firewall" {
   server_version               = "12.0"
   administrator_login          = "mssqladmin"
   administrator_login_password = random_password.admin_password.result
-  enable_telemetry             = false
+  enable_telemetry             = var.enable_telemetry
   firewall_rules = {
     single_ip = {
       start_ip_address = "40.112.8.12"

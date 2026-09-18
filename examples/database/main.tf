@@ -73,7 +73,7 @@ module "sql_server" {
   administrator_login          = "mysqladmin"
   administrator_login_password = random_password.admin_password.result
   databases                    = local.databases
-  enable_telemetry             = false
+  enable_telemetry             = var.enable_telemetry
   name                         = module.naming.sql_server.name_unique
   tags                         = local.tags
 }

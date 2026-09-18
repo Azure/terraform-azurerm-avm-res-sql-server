@@ -77,7 +77,7 @@ module "sql_server" {
     key_vault_resource_id = azurerm_key_vault.this.id
     secret_name           = "sql-admin-password"
   }
-  enable_telemetry                      = false
+  enable_telemetry                      = var.enable_telemetry
   generate_administrator_login_password = true
   name                                  = module.naming.sql_server.name_unique
 
