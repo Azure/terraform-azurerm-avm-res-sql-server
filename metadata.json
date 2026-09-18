@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Azure SQL Server",
+  "moduleDescription": "AVM Resource Module for Azure SQL Server",
+  "canonicalType": "Microsoft.Sql/servers",
+  "owners": [
+    "abhishekaryams"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.res.0f84616"
+}
