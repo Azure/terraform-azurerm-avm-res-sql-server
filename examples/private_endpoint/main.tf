@@ -65,7 +65,7 @@ module "sql_server" {
   administrator_login_password = random_password.admin_password.result
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   name             = module.naming.sql_server.name_unique
   private_endpoints = {
     primary = {

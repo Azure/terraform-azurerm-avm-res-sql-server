@@ -207,6 +207,6 @@ module "sql_server" {
   elastic_pools                = local.elastic_pools
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   name             = module.naming.sql_server.name_unique
 }

@@ -52,7 +52,7 @@ module "sql_server" {
   administrator_login                     = "mysqladmin"
   administrator_login_password_wo         = ephemeral.random_password.admin_password.result
   administrator_login_password_wo_version = 1
-  enable_telemetry                        = false
+  enable_telemetry                        = var.enable_telemetry
   name                                    = module.naming.sql_server.name_unique
   tags                                    = local.tags
 }
