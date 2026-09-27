@@ -34,6 +34,7 @@ resource "azurerm_mssql_database" "this" {
       type         = identity.value.type
     }
   }
+
   dynamic "import" {
     for_each = var.import != null ? { this = var.import } : {}
 
@@ -47,6 +48,7 @@ resource "azurerm_mssql_database" "this" {
       storage_account_id           = var.import.storage_account_id
     }
   }
+
   dynamic "long_term_retention_policy" {
     for_each = var.long_term_retention_policy != null ? { this = var.long_term_retention_policy } : {}
 
@@ -57,6 +59,7 @@ resource "azurerm_mssql_database" "this" {
       yearly_retention  = var.long_term_retention_policy.yearly_retention
     }
   }
+
   dynamic "short_term_retention_policy" {
     for_each = var.short_term_retention_policy != null ? { this = var.short_term_retention_policy } : {}
 
@@ -65,6 +68,7 @@ resource "azurerm_mssql_database" "this" {
       backup_interval_in_hours = var.short_term_retention_policy.backup_interval_in_hours
     }
   }
+
   dynamic "threat_detection_policy" {
     for_each = var.threat_detection_policy != null ? { this = var.threat_detection_policy } : {}
 
@@ -90,7 +94,6 @@ resource "azurerm_mssql_database" "this" {
     }
   }
 }
-
 
 # required AVM resources interfaces
 resource "azurerm_management_lock" "this" {
@@ -140,6 +143,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
       category_group = enabled_log.value
     }
   }
+
   dynamic "metric" {
     for_each = each.value.metric_categories
 

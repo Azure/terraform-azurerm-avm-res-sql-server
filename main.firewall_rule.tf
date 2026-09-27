@@ -17,4 +17,3 @@ resource "azurerm_mssql_firewall_rule" "this" {
     }
   }
 }
-

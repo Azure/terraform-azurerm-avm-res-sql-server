@@ -119,17 +119,8 @@ Source: ../..
 
 Version:
 
-## Benefits of Ephemeral Secrets
+<!-- markdownlint-disable-next-line MD041 -->
+## Data Collection
 
-1. **Enhanced Security**: Passwords are never stored in Terraform state files
-2. **Compliance**: Meets enterprise security requirements for credential management
-3. **Rotation Support**: Version tracking enables automated password rotation
-4. **Backward Compatibility**: Existing `administrator_login_password` usage remains unchanged
-
-## Usage Pattern
-
-This example shows how to use the new ephemeral secrets feature where:
-- `administrator_login_password_wo` provides the password in write-only mode
-- `administrator_login_password_wo_version` tracks the password version for rotation purposes
-- The password is never stored in the Terraform state file
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 <!-- END_TF_DOCS -->

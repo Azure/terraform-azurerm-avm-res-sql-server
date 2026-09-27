@@ -1,4 +1,3 @@
-
 resource "azurerm_private_endpoint" "this" {
   for_each = { for k, v in var.private_endpoints : k => v if var.private_endpoints_manage_dns_zone_group }
 
@@ -15,6 +14,7 @@ resource "azurerm_private_endpoint" "this" {
     private_connection_resource_id = azurerm_mssql_server.this.id
     subresource_names              = ["sqlServer"] # map to each.value.subresource_name if there are multiple services.
   }
+
   dynamic "ip_configuration" {
     for_each = each.value.ip_configurations
 
@@ -25,6 +25,7 @@ resource "azurerm_private_endpoint" "this" {
       subresource_name   = "sqlServer" # map to each.value.subresource_name if there are multiple services.
     }
   }
+
   dynamic "private_dns_zone_group" {
     for_each = length(each.value.private_dns_zone_resource_ids) > 0 ? ["this"] : []
 
@@ -52,6 +53,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
     private_connection_resource_id = azurerm_mssql_server.this.id
     subresource_names              = ["sqlServer"] # map to each.value.subresource_name if there are multiple services.
   }
+
   dynamic "ip_configuration" {
     for_each = each.value.ip_configurations
 

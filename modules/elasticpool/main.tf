@@ -14,6 +14,7 @@ resource "azurerm_mssql_elasticpool" "this" {
     max_capacity = var.per_database_settings.max_capacity
     min_capacity = var.per_database_settings.min_capacity
   }
+
   sku {
     capacity = var.sku.capacity
     name     = var.sku.name
@@ -70,6 +71,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
       category_group = enabled_log.value
     }
   }
+
   dynamic "metric" {
     for_each = each.value.metric_categories
 

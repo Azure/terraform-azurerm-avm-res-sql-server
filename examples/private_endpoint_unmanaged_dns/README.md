@@ -44,10 +44,10 @@ resource "azurerm_virtual_network" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  address_prefixes     = ["192.168.0.0/24"]
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = ["192.168.0.0/24"]
 }
 
 resource "azurerm_private_dns_zone" "this" {
@@ -72,7 +72,7 @@ module "sql_server" {
   administrator_login_password = random_password.admin_password.result
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
   name             = module.naming.sql_server.name_unique
   private_endpoints = {
     primary = {
@@ -116,7 +116,17 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `true`
 
 ## Outputs
 
