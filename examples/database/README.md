@@ -65,7 +65,7 @@ locals {
         tags = local.tags
       }
     },
-    var.creation_source_database_id != null ? {
+    var.creation_source_database_id != null && var.restore_point_in_time != null ? {
       my_sample_db_restore = {
         name                        = "my_sample_db_restore"
         create_mode                 = "PointInTimeRestore"
