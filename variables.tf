@@ -115,6 +115,7 @@ variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
     role_assignments = optional(map(object({
+      name                                   = optional(string, null)
       role_definition_id_or_name             = string
       principal_id                           = string
       description                            = optional(string, null)
@@ -125,12 +126,13 @@ variable "private_endpoints" {
       principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
-      kind = string
-      name = optional(string, null)
+      kind  = string
+      name  = optional(string, null)
+      notes = optional(string, null)
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)
+    subresource_name                        = optional(string, null) # only required if the parent resource exposes more than one private endpoint sub-resource
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -141,6 +143,7 @@ variable "private_endpoints" {
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
+      member_name        = optional(string)
     })), {})
   }))
   default     = {}
@@ -149,6 +152,7 @@ variable "private_endpoints" {
 
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
+    - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
     - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
     - `principal_id` - The ID of the principal to assign the role to.
     - `description` - (Optional) The description of the role assignment.
@@ -160,9 +164,10 @@ variable "private_endpoints" {
   - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
     - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+    - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
   - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
   - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-  - `subresource_name` - The name of the sub resource for the private endpoint.
+  - `subresource_name` - (Optional) The name of the sub resource for the private endpoint.
   - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
   - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
   - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -173,6 +178,7 @@ variable "private_endpoints" {
   - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
     - `name` - The name of the IP configuration.
     - `private_ip_address` - The private IP address of the IP configuration.
+    - `member_name` - (Optional) The private IP configuration member name.
   DESCRIPTION
   nullable    = false
 }
