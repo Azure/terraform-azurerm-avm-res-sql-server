@@ -4,6 +4,10 @@
 
 This is a resource module repo for SQL Server on Azure.
 
+Private endpoint locks and role assignments are applied to the endpoint in both DNS-management modes. Endpoints inherit the server's `lock` when no endpoint lock is supplied; set an endpoint's `lock.kind` to `None` to opt out. Existing endpoint names and resource addresses are unchanged.
+
+The endpoint `subresource_name` and IP configuration `member_name` default to `sqlServer`; supplied values are forwarded rather than ignored. `resource_group_name` remains a resource group **name**, not an ID. A role assignment's `skip_service_principal_aad_check = true` selects `ServicePrincipal` when `principal_type` is omitted. AzAPI does not query the directory.
+
 > [!WARNING]
 > Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
@@ -26,6 +30,8 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.private_endpoint_locks](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoint_role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_key_vault_secret.administrator_login_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
@@ -37,8 +43,10 @@ The following resources are used by this module:
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_password.administrator_login_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
+- [random_uuid.private_endpoint_role_assignment_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource_list.private_endpoint_role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -553,6 +561,24 @@ Type: `bool`
 
 Default: `false`
 
+### <a name="input_ignore_body_changes"></a> [ignore\_body\_changes](#input\_ignore\_body\_changes)
+
+Description: Body-relative dot-notation paths whose changes the AzAPI provider ignores. Ignored configuration is not sent to Azure until the path is removed. Non-empty values require Terraform 1.11 or later, and changes take effect only after apply.
+
+- `authorization_locks` - Ignored body paths for private endpoint locks.
+- `authorization_role_assignments` - Ignored body paths for private endpoint role assignments.
+
+Type:
+
+```hcl
+object({
+    authorization_locks            = optional(list(string), [])
+    authorization_role_assignments = optional(list(string), [])
+  })
+```
+
+Default: `{}`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
@@ -615,34 +641,37 @@ Default: `null`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
-Description:   A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: A map of private endpoints to create on the SQL Server. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-  - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-  - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-    - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-    - `principal_id` - The ID of the principal to assign the role to.
-    - `description` - (Optional) The description of the role assignment.
-    - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-    - `condition` - (Optional) The condition which will be used to scope the role assignment.
-    - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-    - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
-    - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
-  - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-    - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
-    - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-  - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-  - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-  - `subresource_name` - The name of the sub resource for the private endpoint.
-  - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-  - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-  - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-  - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-  - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
-  - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-    - `name` - The name of the IP configuration.
-    - `private_ip_address` - The private IP address of the IP configuration.
+- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
+  - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
+  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+  - `principal_id` - The ID of the principal to assign the role to.
+  - `description` - (Optional) The description of the role assignment.
+  - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+  - `condition` - (Optional) The condition which will be used to scope the role assignment.
+  - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
+  - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
+  - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
+- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+  - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
+- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
+- `subresource_name` (Optional) - The name of the sub resource for the private endpoint.
+- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
+- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+- `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
+- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
+- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+- `resource_group_name` - (Optional) The resource group name where the private endpoint resources will be deployed. Defaults to the resource group of the SQL Server.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `name` - The name of the IP configuration.
+  - `private_ip_address` - The private IP address of the IP configuration.
+  - `member_name` - (Optional) The private IP configuration member name.
 
 Type:
 
@@ -650,6 +679,7 @@ Type:
 map(object({
     name = optional(string, null)
     role_assignments = optional(map(object({
+      name                                   = optional(string, null)
       role_definition_id_or_name             = string
       principal_id                           = string
       description                            = optional(string, null)
@@ -660,12 +690,13 @@ map(object({
       principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
-      kind = string
-      name = optional(string, null)
+      kind  = string
+      name  = optional(string, null)
+      notes = optional(string, null)
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)
+    subresource_name                        = optional(string, null)
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -676,6 +707,7 @@ map(object({
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
+      member_name        = optional(string)
     })), {})
   }))
 ```
@@ -697,6 +729,46 @@ Description: (Optional) Whether public network access is allowed for this server
 Type: `bool`
 
 Default: `false`
+
+### <a name="input_resource_types"></a> [resource\_types](#input\_resource\_types)
+
+Description: AzAPI resource types and API versions used by the module.
+
+- `authorization_locks` - Private endpoint management locks.
+- `authorization_role_assignments` - Private endpoint role assignments.
+
+Type:
+
+```hcl
+object({
+    authorization_locks            = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    authorization_role_assignments = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+  })
+```
+
+Default: `{}`
+
+### <a name="input_retry"></a> [retry](#input\_retry)
+
+Description: Retry configuration applied to every `azapi` resource managed by the module (root resource and all submodules). Defaults to `null` (no custom retry).
+
+- `error_message_regex`  - (Optional) A list of regex patterns matching error messages that trigger a retry.
+- `interval_seconds`     - (Optional) Initial interval between retries in seconds.
+- `max_interval_seconds` - (Optional) Maximum interval between retries in seconds.
+
+See <https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource#retry> for full semantics.
+
+Type:
+
+```hcl
+object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+```
+
+Default: `null`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -735,6 +807,28 @@ Default: `{}`
 Description: (Optional) Tags of the resource.
 
 Type: `map(string)`
+
+Default: `null`
+
+### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
+
+Description: Default per-operation timeouts applied to every `azapi` resource managed by the module. Defaults to `null` (provider defaults). Each value is a Go duration string (e.g. `30m`, `1h`).
+
+- `create` - (Optional) Timeout for create operations.
+- `read`   - (Optional) Timeout for read operations.
+- `update` - (Optional) Timeout for update operations.
+- `delete` - (Optional) Timeout for delete operations.
+
+Type:
+
+```hcl
+object({
+    create = optional(string)
+    read   = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+```
 
 Default: `null`
 
