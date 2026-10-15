@@ -9,6 +9,11 @@ mock_provider "azapi" {
       }
     }
   }
+  mock_data "azapi_client_config" {
+    defaults = {
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+    }
+  }
 }
 
 mock_provider "azurerm" {
@@ -23,8 +28,6 @@ mock_provider "azurerm" {
     }
   }
 }
-
-mock_provider "modtm" {}
 
 mock_provider "random" {
   mock_resource "random_uuid" {
@@ -52,8 +55,8 @@ run "no_endpoints_by_default" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
 
   assert {
@@ -71,8 +74,8 @@ run "managed_defaults_preserve_names_and_addresses" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -111,8 +114,8 @@ run "managed_settings_are_applied" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -205,8 +208,8 @@ run "unmanaged_dns_extensions_and_associations" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints_manage_dns_zone_group = false
@@ -269,8 +272,8 @@ run "role_names_and_generated_assignment_names" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -302,8 +305,8 @@ run "locks_inherit_override_and_opt_out" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     lock = {
@@ -346,8 +349,8 @@ run "role_keys_and_scopes_do_not_collide" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -397,8 +400,8 @@ run "azapi_controls_are_forwarded" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     resource_types = {
@@ -453,8 +456,8 @@ run "invalid_subnet_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = { primary = { subnet_resource_id = "not-a-subnet" } }
@@ -467,8 +470,8 @@ run "invalid_dns_zone_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -486,8 +489,8 @@ run "invalid_application_security_group_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -505,8 +508,8 @@ run "invalid_delegated_identity_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -530,8 +533,8 @@ run "invalid_lock_kind_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -549,8 +552,8 @@ run "invalid_role_assignment_name_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -574,8 +577,8 @@ run "skip_aad_check_rejects_non_service_principals" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -600,8 +603,8 @@ run "invalid_condition_version_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
@@ -626,8 +629,8 @@ run "unknown_role_name_is_rejected" {
   providers = {
     azapi   = azapi
     azurerm = azurerm
-    modtm   = modtm
-    random  = random
+
+    random = random
   }
   variables {
     private_endpoints = {
