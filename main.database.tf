@@ -2,6 +2,7 @@ module "database" {
   source   = "./modules/database"
   for_each = var.databases
 
+  location                                                   = var.location
   name                                                       = each.value.name
   sql_server                                                 = { resource_id = azurerm_mssql_server.this.id }
   auto_pause_delay_in_minutes                                = each.value.auto_pause_delay_in_minutes
@@ -10,6 +11,7 @@ module "database" {
   creation_source_database_id                                = each.value.creation_source_database_id
   diagnostic_settings                                        = each.value.diagnostic_settings
   elastic_pool_id                                            = each.value.elastic_pool_key != null ? module.elasticpool[each.value.elastic_pool_key].resource_id : null
+  enable_telemetry                                           = var.enable_telemetry
   geo_backup_enabled                                         = each.value.geo_backup_enabled
   import                                                     = each.value.import
   ledger_enabled                                             = each.value.ledger_enabled

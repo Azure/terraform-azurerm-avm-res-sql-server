@@ -132,7 +132,7 @@ variable "private_endpoints" {
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = optional(string, null) # only required if the parent resource exposes more than one private endpoint sub-resource
+    subresource_name                        = optional(string, null)
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -148,39 +148,108 @@ variable "private_endpoints" {
   }))
   default     = {}
   description = <<DESCRIPTION
-  A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of private endpoints to create on the SQL Server. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
-  - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
-  - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-    - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
-    - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-    - `principal_id` - The ID of the principal to assign the role to.
-    - `description` - (Optional) The description of the role assignment.
-    - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-    - `condition` - (Optional) The condition which will be used to scope the role assignment.
-    - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-    - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
-    - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
-  - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-    - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
-    - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-    - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
-  - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
-  - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-  - `subresource_name` - (Optional) The name of the sub resource for the private endpoint.
-  - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
-  - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-  - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
-  - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
-  - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
-  - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-    - `name` - The name of the IP configuration.
-    - `private_ip_address` - The private IP address of the IP configuration.
-    - `member_name` - (Optional) The private IP configuration member name.
-  DESCRIPTION
+- `name` - (Optional) The name of the private endpoint. One will be generated if not set.
+- `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
+  - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
+  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+  - `principal_id` - The ID of the principal to assign the role to.
+  - `description` - (Optional) The description of the role assignment.
+  - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+  - `condition` - (Optional) The condition which will be used to scope the role assignment.
+  - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
+  - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
+  - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
+- `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+  - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
+- `tags` - (Optional) A mapping of tags to assign to the private endpoint.
+- `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
+- `subresource_name` (Optional) - The name of the sub resource for the private endpoint.
+- `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
+- `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+- `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+- `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
+- `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
+- `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+- `resource_group_name` - (Optional) The resource group name where the private endpoint resources will be deployed. Defaults to the resource group of the SQL Server.
+- `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `name` - The name of the IP configuration.
+  - `private_ip_address` - The private IP address of the IP configuration.
+  - `member_name` - (Optional) The private IP configuration member name.
+DESCRIPTION
   nullable    = false
+
+  validation {
+    condition = alltrue([
+      for _, v in var.private_endpoints :
+      can(provider::azapi::parse_resource_id("Microsoft.Network/virtualNetworks/subnets", v.subnet_resource_id))
+    ])
+    error_message = "Each `private_endpoints[*].subnet_resource_id` must be a valid subnet resource ID."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for _, v in var.private_endpoints : [
+        for id in v.private_dns_zone_resource_ids :
+        can(provider::azapi::parse_resource_id("Microsoft.Network/privateDnsZones", id))
+      ]
+    ]))
+    error_message = "Each entry in `private_endpoints[*].private_dns_zone_resource_ids` must be a valid private DNS zone resource ID."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for _, v in var.private_endpoints : [
+        for _, asg in v.application_security_group_associations :
+        can(provider::azapi::parse_resource_id("Microsoft.Network/applicationSecurityGroups", asg))
+      ]
+    ]))
+    error_message = "Each value in `private_endpoints[*].application_security_group_associations` must be a valid application security group resource ID."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for _, v in var.private_endpoints : [
+        for _, ra in v.role_assignments :
+        ra.delegated_managed_identity_resource_id == null || can(provider::azapi::parse_resource_id("Microsoft.ManagedIdentity/userAssignedIdentities", ra.delegated_managed_identity_resource_id))
+      ]
+    ]))
+    error_message = "Each `private_endpoints[*].role_assignments[*].delegated_managed_identity_resource_id` must be a valid user-assigned managed identity resource ID, or null."
+  }
+  validation {
+    condition = alltrue([
+      for v in var.private_endpoints :
+      v.lock == null ? true : contains(["None", "CanNotDelete", "ReadOnly"], v.lock.kind)
+    ])
+    error_message = "Each private endpoint lock kind must be None, CanNotDelete, or ReadOnly."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for v in var.private_endpoints : [
+        for ra in v.role_assignments :
+        ra.name == null || can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", ra.name))
+      ]
+    ]))
+    error_message = "Each private endpoint role assignment name must be a lowercase GUID, or null."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for v in var.private_endpoints : [
+        for ra in v.role_assignments :
+        !ra.skip_service_principal_aad_check || ra.principal_type == null || ra.principal_type == "ServicePrincipal"
+      ]
+    ]))
+    error_message = "skip_service_principal_aad_check can only be used with a ServicePrincipal principal_type, or null."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for v in var.private_endpoints : [
+        for ra in v.role_assignments :
+        ra.condition == null ? ra.condition_version == null : ra.condition_version == "2.0"
+      ]
+    ]))
+    error_message = "A private endpoint role assignment condition requires condition_version 2.0; without a condition, condition_version must be null."
+  }
 }
 
 variable "private_endpoints_manage_dns_zone_group" {
