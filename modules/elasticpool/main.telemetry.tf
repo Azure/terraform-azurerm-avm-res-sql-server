@@ -8,14 +8,6 @@ locals {
 }
 
 locals {
-  avm_telemetry_version_token = replace(coalesce(local.avm_module_version, "0.0.0"), ".", "-")
-}
-
-resource "terraform_data" "telemetry" {
-  count = var.enable_telemetry ? 1 : 0
-}
-
-locals {
   avm_module_source_type = (
     can(regex("^registry[.]terraform[.]io/", local.avm_module_source)) ? "t" :
     can(regex("^registry[.]opentofu[.]org/", local.avm_module_source)) ? "o" :
@@ -24,11 +16,19 @@ locals {
   )
 }
 
+data "azapi_client_config" "telemetry" {
+  count = var.enable_telemetry ? 1 : 0
+}
+
 locals {
   main_location = var.location
 }
 
-data "azapi_client_config" "telemetry" {
+locals {
+  avm_telemetry_version_token = replace(coalesce(local.avm_module_version, "0.0.0"), ".", "-")
+}
+
+resource "terraform_data" "telemetry" {
   count = var.enable_telemetry ? 1 : 0
 }
 

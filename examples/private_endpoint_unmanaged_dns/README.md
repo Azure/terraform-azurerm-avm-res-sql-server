@@ -51,7 +51,7 @@ resource "azurerm_subnet" "this" {
 }
 
 resource "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.vaultcore.azure.net"
+  name                = "privatelink.database.windows.net"
   resource_group_name = azurerm_resource_group.this.name
 }
 
