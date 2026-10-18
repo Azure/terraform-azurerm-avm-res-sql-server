@@ -55,10 +55,12 @@ resource "azurerm_mssql_server" "this" {
 module "sql_database" {
   source = "../../modules/database"
 
-  name = "my-database"
+  location = var.location
+  name     = "my-database"
   sql_server = {
     resource_id = azurerm_mssql_server.this.id
   }
+  enable_telemetry = var.enable_telemetry
 }
 ```
 
@@ -88,7 +90,25 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ## Outputs
 

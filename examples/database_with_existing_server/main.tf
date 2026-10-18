@@ -48,8 +48,10 @@ resource "azurerm_mssql_server" "this" {
 module "sql_database" {
   source = "../../modules/database"
 
-  name = "my-database"
+  location = var.location
+  name     = "my-database"
   sql_server = {
     resource_id = azurerm_mssql_server.this.id
   }
+  enable_telemetry = var.enable_telemetry
 }

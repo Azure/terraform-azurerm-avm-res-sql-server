@@ -8,6 +8,7 @@ module "elasticpool" {
     resource_id = azurerm_mssql_server.this.id
   }
   diagnostic_settings            = each.value.diagnostic_settings
+  enable_telemetry               = var.enable_telemetry
   license_type                   = each.value.license_type
   lock                           = each.value.lock
   maintenance_configuration_name = each.value.maintenance_configuration_name

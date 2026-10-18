@@ -53,15 +53,18 @@ module "sql_elastic_pool" {
   sql_server = {
     resource_id = azurerm_mssql_server.this.id
   }
+  enable_telemetry = var.enable_telemetry
 }
 
 module "sql_database" {
   source = "../../modules/database"
 
-  name = "my-database"
+  location = var.location
+  name     = "my-database"
   sql_server = {
     resource_id = azurerm_mssql_server.this.id
   }
-  elastic_pool_id = module.sql_elastic_pool.resource_id
-  sku_name        = "ElasticPool"
+  elastic_pool_id  = module.sql_elastic_pool.resource_id
+  enable_telemetry = var.enable_telemetry
+  sku_name         = "ElasticPool"
 }
