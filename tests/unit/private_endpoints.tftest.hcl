@@ -37,6 +37,8 @@ mock_provider "random" {
   }
 }
 
+mock_provider "time" {}
+
 variables {
   name                = "sql-endpoint-test"
   location            = "eastus"
@@ -57,6 +59,7 @@ run "no_endpoints_by_default" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
 
   assert {
@@ -76,6 +79,7 @@ run "managed_defaults_preserve_names_and_addresses" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -116,6 +120,7 @@ run "managed_settings_are_applied" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -210,6 +215,7 @@ run "unmanaged_dns_extensions_and_associations" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints_manage_dns_zone_group = false
@@ -274,6 +280,7 @@ run "role_names_and_generated_assignment_names" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -307,6 +314,7 @@ run "locks_inherit_override_and_opt_out" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     lock = {
@@ -351,6 +359,7 @@ run "role_keys_and_scopes_do_not_collide" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -402,6 +411,7 @@ run "azapi_controls_are_forwarded" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     resource_types = {
@@ -458,6 +468,7 @@ run "invalid_subnet_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = { primary = { subnet_resource_id = "not-a-subnet" } }
@@ -472,6 +483,7 @@ run "invalid_dns_zone_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -491,6 +503,7 @@ run "invalid_application_security_group_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -510,6 +523,7 @@ run "invalid_delegated_identity_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -535,6 +549,7 @@ run "invalid_lock_kind_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -554,6 +569,7 @@ run "invalid_role_assignment_name_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -579,6 +595,7 @@ run "skip_aad_check_rejects_non_service_principals" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -605,6 +622,7 @@ run "invalid_condition_version_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {
@@ -631,6 +649,7 @@ run "unknown_role_name_is_rejected" {
     azurerm = azurerm
 
     random = random
+    time   = time
   }
   variables {
     private_endpoints = {

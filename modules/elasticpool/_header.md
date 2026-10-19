@@ -10,6 +10,15 @@ The module supports:
 
 - Creating a new elastic pool
 
+## Deletion behavior
+
+The module waits 60 seconds before deleting an elastic pool, after dependent
+databases have been deleted. Azure can briefly retain pool membership after
+database deletion completes and reject pool deletion with `ElasticPoolNotEmpty`.
+The grace period applies to deletion only; creation has no added delay.
+Databases managed outside this module must reference a pool output to participate
+in this ordering.
+
 ## Usage
 
 To use this module in your Terraform configuration, you'll need to provide values for the required variables.

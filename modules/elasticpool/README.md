@@ -12,6 +12,15 @@ The module supports:
 
 - Creating a new elastic pool
 
+## Deletion behavior
+
+The module waits 60 seconds before deleting an elastic pool, after dependent
+databases have been deleted. Azure can briefly retain pool membership after
+database deletion completes and reject pool deletion with `ElasticPoolNotEmpty`.
+The grace period applies to deletion only; creation has no added delay.
+Databases managed outside this module must reference a pool output to participate
+in this ordering.
+
 ## Usage
 
 To use this module in your Terraform configuration, you'll need to provide values for the required variables.
@@ -43,6 +52,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.13)
+
 ## Resources
 
 The following resources are used by this module:
@@ -53,6 +64,7 @@ The following resources are used by this module:
 - [azurerm_mssql_elasticpool.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_elasticpool) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [terraform_data.telemetry](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
+- [time_sleep.wait_for_database_deletion](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
