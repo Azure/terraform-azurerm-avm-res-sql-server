@@ -23,6 +23,13 @@ resource "azurerm_mssql_elasticpool" "this" {
   }
 }
 
+# Azure can briefly retain pool membership after database deletion completes.
+resource "time_sleep" "wait_for_database_deletion" {
+  destroy_duration = "60s"
+
+  depends_on = [azurerm_mssql_elasticpool.this]
+}
+
 # required AVM resources interfaces
 resource "azurerm_management_lock" "this" {
   count = var.lock != null ? 1 : 0
