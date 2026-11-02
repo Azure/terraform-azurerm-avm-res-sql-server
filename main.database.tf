@@ -2,7 +2,6 @@ module "database" {
   source   = "./modules/database"
   for_each = var.databases
 
-  location                                                   = var.location
   name                                                       = each.value.name
   sql_server                                                 = { resource_id = azurerm_mssql_server.this.id }
   auto_pause_delay_in_minutes                                = each.value.auto_pause_delay_in_minutes
@@ -16,6 +15,7 @@ module "database" {
   import                                                     = each.value.import
   ledger_enabled                                             = each.value.ledger_enabled
   license_type                                               = each.value.license_type
+  location                                                   = var.location
   lock                                                       = each.value.lock
   long_term_retention_policy                                 = each.value.long_term_retention_policy
   maintenance_configuration_name                             = each.value.maintenance_configuration_name
