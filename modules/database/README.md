@@ -60,12 +60,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The Azure region for this module's resources or telemetry deployment.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: The name of the database.
@@ -219,6 +213,14 @@ Default: `false`
 ### <a name="input_license_type"></a> [license\_type](#input\_license\_type)
 
 Description: The license type for the database.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
 
 Type: `string`
 
