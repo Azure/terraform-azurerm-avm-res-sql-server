@@ -112,6 +112,22 @@ variable "geo_backup_enabled" {
   description = "Whether geo-backup is enabled for the database."
 }
 
+variable "ignore_body_changes" {
+  type = object({
+    authorization_locks            = optional(list(string), [])
+    authorization_role_assignments = optional(list(string), [])
+    insights_diagnostic_settings   = optional(list(string), [])
+  })
+  default     = {}
+  description = <<DESCRIPTION
+Body-relative dot-notation paths whose changes the AzAPI provider ignores. Passed through from the root module.
+- `authorization_locks` - Ignored body paths for the management lock.
+- `authorization_role_assignments` - Ignored body paths for role assignments.
+- `insights_diagnostic_settings` - Ignored body paths for diagnostic settings.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "import" {
   type = object({
     storage_uri                  = string
@@ -283,6 +299,22 @@ variable "recover_database_id" {
   description = "The ID of the database to recover."
 }
 
+variable "resource_types" {
+  type = object({
+    authorization_locks            = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    authorization_role_assignments = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+    insights_diagnostic_settings   = optional(string, "Microsoft.Insights/diagnosticSettings@2021-05-01-preview")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+AzAPI resource types and API versions used by the module. Passed through from the root module.
+- `authorization_locks` - The management lock.
+- `authorization_role_assignments` - Role assignments.
+- `insights_diagnostic_settings` - Diagnostic settings.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "restore_dropped_database_id" {
   type        = string
   default     = null
@@ -293,6 +325,16 @@ variable "restore_point_in_time" {
   type        = string
   default     = null
   description = "The point in time to restore the database to."
+}
+
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+  default     = null
+  description = "Retry configuration applied to every `azapi` resource managed by the module. Passed through from the root module."
 }
 
 variable "role_assignments" {
@@ -387,6 +429,17 @@ Controls the Threat Detection Policy configuration on this resource. The followi
 - `storage_account_access_key` - (Required) Specifies the access key of the storage account to which the Threat Detection audit logs are sent.
 - `storage_endpoint` - (Required) Specifies the endpoint of the storage account to which the Threat Detection audit logs are sent.
 DESCRIPTION
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    read   = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default     = null
+  description = "Per-operation timeouts applied to every `azapi` resource managed by the module. Passed through from the root module."
 }
 
 variable "transparent_data_encryption_enabled" {
