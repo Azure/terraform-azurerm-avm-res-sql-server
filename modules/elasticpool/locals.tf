@@ -4,10 +4,6 @@ locals {
 }
 
 locals {
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-}
-
-locals {
   # Azure reports a diagnostic setting with every category and category group it offers, so the
   # module sends the full set with explicit enabled flags rather than only the selected entries.
   diagnostic_categories = try(data.azapi_resource_list.diagnostic_categories[0].output.categories, [])

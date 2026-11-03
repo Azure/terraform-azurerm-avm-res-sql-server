@@ -120,6 +120,62 @@ run "server_role_assignment_unknown_name_fails" {
   expect_failures = [azapi_resource.role_assignments["missing"]]
 }
 
+run "server_role_assignments_keep_azurerm_defaults" {
+  command = apply
+
+  variables {
+    role_assignments = {
+      conditional = {
+        role_definition_id_or_name = "Reader"
+        principal_id               = "00000000-0000-0000-0000-000000000002"
+        condition                  = "@Resource[Microsoft.Sql/servers:name] StringEquals 'sql-test'"
+      }
+      delegated = {
+        role_definition_id_or_name             = "Reader"
+        principal_id                           = "00000000-0000-0000-0000-000000000003"
+        delegated_managed_identity_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-test"
+        skip_service_principal_aad_check       = true
+      }
+    }
+  }
+
+  assert {
+    condition     = azapi_resource.role_assignments["conditional"].body.properties.conditionVersion == "2.0" && azapi_resource.role_assignments["delegated"].body.properties.conditionVersion == null
+    error_message = "A condition without a version MUST send 2.0, as the AzureRM provider did."
+  }
+
+  assert {
+    condition     = azapi_resource.role_assignments["conditional"].ignore_null_property
+    error_message = "Null properties MUST NOT be sent, so that the principal type that Azure infers does not show as a difference."
+  }
+
+  assert {
+    condition     = jsonencode(azapi_resource.role_assignments["conditional"].retry.error_message_regex) == jsonencode(["PrincipalNotFound"]) && jsonencode(azapi_resource.role_assignments["delegated"].retry.error_message_regex) == jsonencode(["PrincipalNotFound", "LinkedAuthorizationFailed"])
+    error_message = "Role assignments MUST retry the replication errors that the AzureRM provider retried."
+  }
+}
+
+run "server_role_assignment_retry_override" {
+  command = plan
+
+  variables {
+    retry = {
+      error_message_regex = ["Custom"]
+    }
+    role_assignments = {
+      reader = {
+        role_definition_id_or_name = "Reader"
+        principal_id               = "00000000-0000-0000-0000-000000000002"
+      }
+    }
+  }
+
+  assert {
+    condition     = jsonencode(azapi_resource.role_assignments["reader"].retry.error_message_regex) == jsonencode(["Custom"])
+    error_message = "A retry from the caller MUST replace the default retry."
+  }
+}
+
 run "server_diagnostic_settings_send_explicit_flags" {
   command = apply
 
