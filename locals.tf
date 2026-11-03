@@ -1,8 +1,4 @@
 locals {
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-}
-
-locals {
   # Resolve the effective administrator password:
   # - Use var.administrator_login_password if explicitly provided.
   # - Otherwise, if generate_administrator_login_password is true, use the generated random password.
