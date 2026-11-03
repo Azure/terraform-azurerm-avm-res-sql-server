@@ -74,6 +74,22 @@ DESCRIPTION
   nullable    = false
 }
 
+variable "ignore_body_changes" {
+  type = object({
+    authorization_locks            = optional(list(string), [])
+    authorization_role_assignments = optional(list(string), [])
+    insights_diagnostic_settings   = optional(list(string), [])
+  })
+  default     = {}
+  description = <<DESCRIPTION
+Body-relative dot-notation paths whose changes the AzAPI provider ignores. Passed through from the root module.
+- `authorization_locks` - Ignored body paths for the management lock.
+- `authorization_role_assignments` - Ignored body paths for role assignments.
+- `insights_diagnostic_settings` - Ignored body paths for diagnostic settings.
+DESCRIPTION
+  nullable    = false
+}
+
 variable "license_type" {
   type        = string
   default     = "LicenseIncluded"
@@ -167,6 +183,32 @@ DESCRIPTION
     condition     = var.per_database_settings.min_capacity >= 0 && var.per_database_settings.max_capacity >= 0
     error_message = "min_capacity and max_capacity must be greater than or equal to 0."
   }
+}
+
+variable "resource_types" {
+  type = object({
+    authorization_locks            = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    authorization_role_assignments = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+    insights_diagnostic_settings   = optional(string, "Microsoft.Insights/diagnosticSettings@2021-05-01-preview")
+  })
+  default     = {}
+  description = <<DESCRIPTION
+AzAPI resource types and API versions used by the module. Passed through from the root module.
+- `authorization_locks` - The management lock.
+- `authorization_role_assignments` - Role assignments.
+- `insights_diagnostic_settings` - Diagnostic settings.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string))
+    interval_seconds     = optional(number)
+    max_interval_seconds = optional(number)
+  })
+  default     = null
+  description = "Retry configuration applied to every `azapi` resource managed by the module. Passed through from the root module."
 }
 
 variable "role_assignments" {
@@ -283,6 +325,17 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    read   = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default     = null
+  description = "Per-operation timeouts applied to every `azapi` resource managed by the module. Passed through from the root module."
 }
 
 variable "zone_redundant" {

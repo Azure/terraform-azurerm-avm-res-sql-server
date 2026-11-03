@@ -8,6 +8,35 @@ Private endpoint locks and role assignments are applied to the endpoint in both 
 
 The endpoint `subresource_name` and IP configuration `member_name` default to `sqlServer`; supplied values are forwarded rather than ignored. `resource_group_name` remains a resource group **name**, not an ID. A role assignment's `skip_service_principal_aad_check = true` selects `ServicePrincipal` when `principal_type` is omitted. AzAPI does not query the directory.
 
+## Upgrading to the AzAPI resources
+
+Resources move from AzureRM to AzAPI with `moved` blocks, so the plan after upgrading reports them as moved and Azure keeps them. These cases need extra steps:
+
+- **`ReadOnly` lock.** The upgrade updates resources in place, which a `ReadOnly` lock blocks. Before upgrading, apply your configuration without the lock using the old version, then upgrade and restore the lock.
+- **Cross-tenant role assignments** (those that set `delegated_managed_identity_resource_id`, for example with Azure Lighthouse). The AzureRM provider stored their ID with a `|<tenant-id>` suffix that a `moved` block cannot convert. Before planning, remove each one from the state, then import it at its new address with an `import` block in your root module. For a database or elastic pool, use `module.<module-name>.module.database["<database key>"]` or `module.<module-name>.module.elasticpool["<pool key>"]` instead of `module.<module-name>`:
+
+  ```shell
+  terraform state rm 'module.<module-name>.azurerm_role_assignment.this["<key>"]'
+  ```
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.role_assignments["<key>"]
+    id = "<role assignment resource ID, without the |<tenant-id> suffix>"
+  }
+  ```
+
+- **Private DNS zone groups managed by the module** (`private_endpoints_manage_dns_zone_group` is true, the default, and a private endpoint sets `private_dns_zone_resource_ids`). The AzureRM provider kept the zone group inside the private endpoint, so there is no separate address for a `moved` block to start from, and AzAPI does not take over an existing resource it did not create. Import each zone group once with an `import` block in your root module:
+
+  ```hcl
+  import {
+    to = module.<module-name>.azapi_resource.private_dns_zone_groups["<key>"]
+    id = "/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/privateEndpoints/<private-endpoint-name>/privateDnsZoneGroups/<zone-group-name>?api-version=2024-05-01"
+  }
+  ```
+
+  `<key>` is the key of the `private_endpoints` entry, `<private-endpoint-name>` is its `name` (`pep-<server name>` by default), and `<zone-group-name>` is its `private_dns_zone_group_name` (`default` by default). The import leaves the zone group and its DNS records unchanged. Without it, the apply stops with `Resource already exists`, and nothing in Azure is removed; add the block and apply again. Remove the block once the upgrade is applied.
+
 > [!WARNING]
 > Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
@@ -28,23 +57,27 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_dns_zone_groups](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.private_endpoint_locks](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.private_endpoint_role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoints](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoints_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_key_vault_secret.administrator_login_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) (resource)
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
-- [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
-- [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [random_password.administrator_login_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 - [random_uuid.private_endpoint_role_assignment_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [random_uuid.role_assignment_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [terraform_data.telemetry](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.private_endpoint_network_interfaces](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
+- [azapi_resource_list.diagnostic_categories](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 - [azapi_resource_list.private_endpoint_role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
+- [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -564,15 +597,21 @@ Default: `false`
 
 Description: Body-relative dot-notation paths whose changes the AzAPI provider ignores. Ignored configuration is not sent to Azure until the path is removed. Non-empty values require Terraform 1.11 or later, and changes take effect only after apply.
 
-- `authorization_locks` - Ignored body paths for private endpoint locks.
-- `authorization_role_assignments` - Ignored body paths for private endpoint role assignments.
+- `authorization_locks` - Ignored body paths for management locks.
+- `authorization_role_assignments` - Ignored body paths for role assignments.
+- `insights_diagnostic_settings` - Ignored body paths for diagnostic settings.
+- `network_private_endpoints` - Ignored body paths for private endpoints.
+- `network_private_endpoints_private_dns_zone_groups` - Ignored body paths for private endpoint DNS zone groups.
 
 Type:
 
 ```hcl
 object({
-    authorization_locks            = optional(list(string), [])
-    authorization_role_assignments = optional(list(string), [])
+    authorization_locks                               = optional(list(string), [])
+    authorization_role_assignments                    = optional(list(string), [])
+    insights_diagnostic_settings                      = optional(list(string), [])
+    network_private_endpoints                         = optional(list(string), [])
+    network_private_endpoints_private_dns_zone_groups = optional(list(string), [])
   })
 ```
 
@@ -733,15 +772,21 @@ Default: `false`
 
 Description: AzAPI resource types and API versions used by the module.
 
-- `authorization_locks` - Private endpoint management locks.
-- `authorization_role_assignments` - Private endpoint role assignments.
+- `authorization_locks` - Management locks.
+- `authorization_role_assignments` - Role assignments.
+- `insights_diagnostic_settings` - Diagnostic settings.
+- `network_private_endpoints` - Private endpoints.
+- `network_private_endpoints_private_dns_zone_groups` - Private endpoint DNS zone groups.
 
 Type:
 
 ```hcl
 object({
-    authorization_locks            = optional(string, "Microsoft.Authorization/locks@2020-05-01")
-    authorization_role_assignments = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+    authorization_locks                               = optional(string, "Microsoft.Authorization/locks@2020-05-01")
+    authorization_role_assignments                    = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+    insights_diagnostic_settings                      = optional(string, "Microsoft.Insights/diagnosticSettings@2021-05-01-preview")
+    network_private_endpoints                         = optional(string, "Microsoft.Network/privateEndpoints@2024-05-01")
+    network_private_endpoints_private_dns_zone_groups = optional(string, "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01")
   })
 ```
 
