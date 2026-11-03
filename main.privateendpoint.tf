@@ -156,13 +156,20 @@ resource "azapi_resource" "private_endpoint_role_assignments" {
     }
   }
   ignore_body_changes = length(var.ignore_body_changes.authorization_role_assignments) > 0 ? var.ignore_body_changes.authorization_role_assignments : null
+  # Azure returns the principal type it infers, so a null one is not sent.
+  ignore_null_property = true
   replace_triggers_refs = [
     "properties.principalId",
     "properties.roleDefinitionId",
     "properties.delegatedManagedIdentityResourceId",
   ]
   response_export_values = []
-  retry                  = var.retry
+  # The AzureRM provider retried while a new principal, or the link of a delegated identity, replicated.
+  retry = var.retry != null ? var.retry : {
+    error_message_regex  = each.value.role.delegated_managed_identity_resource_id != null && each.value.role.skip_service_principal_aad_check ? ["PrincipalNotFound", "LinkedAuthorizationFailed"] : ["PrincipalNotFound"]
+    interval_seconds     = null
+    max_interval_seconds = null
+  }
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

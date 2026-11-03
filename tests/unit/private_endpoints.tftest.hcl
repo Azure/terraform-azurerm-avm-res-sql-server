@@ -320,6 +320,39 @@ run "role_names_and_generated_assignment_names" {
   }
 }
 
+run "role_assignments_keep_azurerm_defaults" {
+  command = apply
+  providers = {
+    azapi   = azapi
+    azurerm = azurerm
+
+    random = random
+    time   = time
+  }
+  variables {
+    private_endpoints = {
+      primary = {
+        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet/subnets/default"
+        role_assignments = {
+          reader = {
+            role_definition_id_or_name = "Reader"
+            principal_id               = "22222222-2222-2222-2222-222222222222"
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = alltrue([for assignment in azapi_resource.private_endpoint_role_assignments : assignment.ignore_null_property])
+    error_message = "Null properties MUST NOT be sent, so that the principal type that Azure infers does not show as a difference."
+  }
+  assert {
+    condition     = alltrue([for assignment in azapi_resource.private_endpoint_role_assignments : jsonencode(assignment.retry.error_message_regex) == jsonencode(["PrincipalNotFound"])])
+    error_message = "Role assignments MUST retry PrincipalNotFound when no retry is given, as the AzureRM provider did."
+  }
+}
+
 run "locks_inherit_override_and_opt_out" {
   command = apply
   providers = {
