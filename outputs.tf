@@ -35,6 +35,11 @@ output "resource_elasticpools" {
   value       = module.elasticpool
 }
 
+output "resource_fqdn" {
+  description = "The fully qualified domain name of the SQL Server."
+  value       = azurerm_mssql_server.this.fully_qualified_domain_name
+}
+
 output "resource_id" {
   description = "This is the id of the resource."
   value       = azurerm_mssql_server.this.id
@@ -43,4 +48,9 @@ output "resource_id" {
 output "resource_name" {
   description = "This is the name of the resource."
   value       = azurerm_mssql_server.this.name
+}
+
+output "system_assigned_mi_principal_id" {
+  description = "The principal ID of the SQL Server's system-assigned managed identity, or `null` when `managed_identities.system_assigned` is not enabled."
+  value       = var.managed_identities.system_assigned ? azurerm_mssql_server.this.identity[0].principal_id : null
 }
