@@ -879,6 +879,10 @@ Description: This is the id of the resource.
 
 Description: This is the name of the resource.
 
+### <a name="output_system_assigned_mi_principal_id"></a> [system\_assigned\_mi\_principal\_id](#output\_system\_assigned\_mi\_principal\_id)
+
+Description: The principal ID of the SQL Server's system-assigned managed identity, or `null` when `managed_identities.system_assigned` is not enabled.
+
 ## Modules
 
 The following Modules are called:

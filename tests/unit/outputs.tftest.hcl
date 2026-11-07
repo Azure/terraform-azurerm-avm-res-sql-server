@@ -50,3 +50,18 @@ run "resource_fqdn_is_discrete_and_not_sensitive" {
     error_message = "resource_fqdn must not be marked sensitive."
   }
 }
+
+run "system_assigned_mi_principal_id_is_null_without_system_assigned_identity" {
+  command = apply
+  providers = {
+    azapi   = azapi
+    azurerm = azurerm
+    random  = random
+    time    = time
+  }
+
+  assert {
+    condition     = output.system_assigned_mi_principal_id == null
+    error_message = "system_assigned_mi_principal_id must be null when the system-assigned identity is not enabled."
+  }
+}

@@ -49,3 +49,8 @@ output "resource_name" {
   description = "This is the name of the resource."
   value       = azurerm_mssql_server.this.name
 }
+
+output "system_assigned_mi_principal_id" {
+  description = "The principal ID of the SQL Server's system-assigned managed identity, or `null` when `managed_identities.system_assigned` is not enabled."
+  value       = var.managed_identities.system_assigned ? azurerm_mssql_server.this.identity[0].principal_id : null
+}
