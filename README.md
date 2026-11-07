@@ -867,6 +867,10 @@ Description: A map of databases. The map key is the supplied input to var.databa
 
 Description: A map of elastic pools. The map key is the supplied input to var.elastic\_pools. The map value is the entire azurerm\_mssql\_elasticpool resource.
 
+### <a name="output_resource_fqdn"></a> [resource\_fqdn](#output\_resource\_fqdn)
+
+Description: The fully qualified domain name of the SQL Server.
+
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: This is the id of the resource.

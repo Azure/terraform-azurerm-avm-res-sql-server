@@ -35,6 +35,11 @@ output "resource_elasticpools" {
   value       = module.elasticpool
 }
 
+output "resource_fqdn" {
+  description = "The fully qualified domain name of the SQL Server."
+  value       = azurerm_mssql_server.this.fully_qualified_domain_name
+}
+
 output "resource_id" {
   description = "This is the id of the resource."
   value       = azurerm_mssql_server.this.id
