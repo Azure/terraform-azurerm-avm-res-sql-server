@@ -89,8 +89,8 @@ resource "azurerm_mssql_database" "this" {
       error_message = "When creating a database resource with an elastic_pool_id, the maintenance_configuration_name is not supported at the database scope. Set this on the elastic pool instead."
     }
     precondition {
-      condition     = !contains(["Copy", "OnlineSecondary", "PointInTimeRestore", "Recovery", "Restore", "RestoreExternalBackup", "RestoreExternalBackupSecondary", "RestoreLongTermRetentionBackup", "Secondary"], var.create_mode) || var.creation_source_database_id != null
-      error_message = "'creation_source_database_id' must be set when 'create_mode' is not 'Default'."
+      condition     = !contains(["Copy", "OnlineSecondary", "PointInTimeRestore", "RestoreExternalBackup", "RestoreExternalBackupSecondary", "RestoreLongTermRetentionBackup", "Secondary"], var.create_mode) || var.creation_source_database_id != null
+      error_message = "'creation_source_database_id' must be set for Copy, OnlineSecondary, PointInTimeRestore, RestoreExternalBackup, RestoreExternalBackupSecondary, RestoreLongTermRetentionBackup, and Secondary create modes."
     }
   }
 }

@@ -108,7 +108,7 @@ Default: `"Default"`
 
 ### <a name="input_creation_source_database_id"></a> [creation\_source\_database\_id](#input\_creation\_source\_database\_id)
 
-Description: The ID of the source database from which to create the new database. This should only be used for database create modes other than `Default`.
+Description: The ID of the source database for create modes that require it. `Recovery` uses `recover_database_id` and `Restore` uses `restore_dropped_database_id` instead. Changing this forces a new resource to be created.
 
 Type: `string`
 
