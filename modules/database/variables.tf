@@ -41,7 +41,7 @@ variable "create_mode" {
 variable "creation_source_database_id" {
   type        = string
   default     = null
-  description = "The ID of the source database from which to create the new database. This should only be used for database create modes other than `Default`."
+  description = "The ID of the source database for create modes that require it. `Recovery` uses `recover_database_id` and `Restore` uses `restore_dropped_database_id` instead. Changing this forces a new resource to be created."
 }
 
 variable "diagnostic_settings" {
