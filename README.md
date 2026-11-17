@@ -8,6 +8,12 @@ Private endpoint locks and role assignments are applied to the endpoint in both 
 
 The endpoint `subresource_name` and IP configuration `member_name` default to `sqlServer`; supplied values are forwarded rather than ignored. `resource_group_name` remains a resource group **name**, not an ID. A role assignment's `skip_service_principal_aad_check = true` selects `ServicePrincipal` when `principal_type` is omitted. AzAPI does not query the directory.
 
+## Telemetry upgrade
+
+Telemetry uses an empty Azure deployment instead of the ModTM provider. When upgrading an existing deployment, keep the old providers available for the first initialization and apply so Terraform can forget `modtm_telemetry.telemetry` and the telemetry-only `random_uuid.telemetry` without destroying them.
+
+Telemetry remains enabled by default and requires `Microsoft.Resources/deployments/read`, `Microsoft.Resources/deployments/write`, and `Microsoft.Resources/deployments/delete` at the active subscription scope. Set `enable_telemetry = false` to opt out; the SQL resource location is still required.
+
 ## Upgrading to the AzAPI resources
 
 Resources move from AzureRM to AzAPI with `moved` blocks, so the plan after upgrading reports them as moved and Azure keeps them. These cases need extra steps:
