@@ -1,4 +1,22 @@
 mock_provider "azapi" {
+  mock_resource "azapi_resource" {
+    defaults = {
+      id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/privateEndpoints/pe-test"
+      output = {
+        properties = {
+          customDnsConfigs  = []
+          networkInterfaces = [{ id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/networkInterfaces/pe-test-nic" }]
+        }
+      }
+    }
+  }
+  mock_data "azapi_resource" {
+    defaults = {
+      output = {
+        private_ip_address = "10.0.0.4"
+      }
+    }
+  }
   mock_data "azapi_resource_list" {
     defaults = {
       output = {
@@ -20,11 +38,6 @@ mock_provider "azurerm" {
   mock_resource "azurerm_mssql_server" {
     defaults = {
       id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Sql/servers/sql-endpoint-test"
-    }
-  }
-  mock_resource "azurerm_private_endpoint" {
-    defaults = {
-      id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/privateEndpoints/pe-test"
     }
   }
 }
@@ -96,7 +109,7 @@ run "managed_defaults_preserve_names_and_addresses" {
   }
 
   assert {
-    condition     = toset(keys(azurerm_private_endpoint.this)) == toset(["primary"]) && length(azurerm_private_endpoint.this_unmanaged_dns_zone_groups) == 0
+    condition     = toset(keys(azapi_resource.private_endpoints)) == toset(["primary"]) && length(azapi_resource.private_endpoints_unmanaged_dns_zone_groups) == 0
     error_message = "Managed endpoints must retain their original resource address."
   }
   assert {
@@ -180,7 +193,7 @@ run "managed_settings_are_applied" {
     error_message = "Managed DNS settings must remain attached to the endpoint."
   }
   assert {
-    condition     = azurerm_private_endpoint_application_security_group_association.this["primary-web"].private_endpoint_id == output.private_endpoints["primary"].id
+    condition     = jsonencode(azapi_resource.private_endpoints["primary"].body.properties.applicationSecurityGroups) == jsonencode([{ id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/applicationSecurityGroups/web" }])
     error_message = "Managed application security group associations must retain the original address and endpoint scope."
   }
   assert {
@@ -252,7 +265,7 @@ run "unmanaged_dns_extensions_and_associations" {
   }
 
   assert {
-    condition     = length(azurerm_private_endpoint.this) == 0 && toset(keys(azurerm_private_endpoint.this_unmanaged_dns_zone_groups)) == toset(["primary"]) && output.private_endpoints["primary"].name == "unmanaged-endpoint"
+    condition     = length(azapi_resource.private_endpoints) == 0 && toset(keys(azapi_resource.private_endpoints_unmanaged_dns_zone_groups)) == toset(["primary"]) && output.private_endpoints["primary"].name == "unmanaged-endpoint"
     error_message = "Externally managed DNS must retain the unmanaged endpoint resource address and output."
   }
   assert {
@@ -260,7 +273,7 @@ run "unmanaged_dns_extensions_and_associations" {
     error_message = "Unmanaged endpoints must honor connection and IP member overrides."
   }
   assert {
-    condition     = azurerm_private_endpoint_application_security_group_association.this["primary-web"].private_endpoint_id == azurerm_private_endpoint.this_unmanaged_dns_zone_groups["primary"].id
+    condition     = jsonencode(azapi_resource.private_endpoints_unmanaged_dns_zone_groups["primary"].body.properties.applicationSecurityGroups) == jsonencode([{ id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/applicationSecurityGroups/web" }])
     error_message = "Unmanaged application security group associations must use the unmanaged endpoint, not an empty managed collection."
   }
   assert {
@@ -304,6 +317,39 @@ run "role_names_and_generated_assignment_names" {
   assert {
     condition     = length(random_uuid.private_endpoint_role_assignment_name) == 1 && alltrue([for assignment in azapi_resource.private_endpoint_role_assignments : assignment.name == "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee" && assignment.body.properties.roleDefinitionId == "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7" && assignment.body.properties.principalType == "ServicePrincipal"])
     error_message = "Role names must resolve case-insensitively and omitted assignment names must use a persisted UUID; the skip flag must select ServicePrincipal."
+  }
+}
+
+run "role_assignments_keep_azurerm_defaults" {
+  command = apply
+  providers = {
+    azapi   = azapi
+    azurerm = azurerm
+
+    random = random
+    time   = time
+  }
+  variables {
+    private_endpoints = {
+      primary = {
+        subnet_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet/subnets/default"
+        role_assignments = {
+          reader = {
+            role_definition_id_or_name = "Reader"
+            principal_id               = "22222222-2222-2222-2222-222222222222"
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = alltrue([for assignment in azapi_resource.private_endpoint_role_assignments : assignment.ignore_null_property])
+    error_message = "Null properties MUST NOT be sent, so that the principal type that Azure infers does not show as a difference."
+  }
+  assert {
+    condition     = alltrue([for assignment in azapi_resource.private_endpoint_role_assignments : jsonencode(assignment.retry.error_message_regex) == jsonencode(["PrincipalNotFound"])])
+    error_message = "Role assignments MUST retry PrincipalNotFound when no retry is given, as the AzureRM provider did."
   }
 }
 
@@ -386,15 +432,17 @@ run "role_keys_and_scopes_do_not_collide" {
     }
   }
   override_resource {
-    target = azurerm_private_endpoint.this["a-b"]
+    target = azapi_resource.private_endpoints["a-b"]
     values = {
-      id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/privateEndpoints/first-endpoint"
+      id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/privateEndpoints/first-endpoint"
+      output = { properties = { customDnsConfigs = [], networkInterfaces = [{ id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/networkInterfaces/first-endpoint-nic" }] } }
     }
   }
   override_resource {
-    target = azurerm_private_endpoint.this["a"]
+    target = azapi_resource.private_endpoints["a"]
     values = {
-      id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/privateEndpoints/second-endpoint"
+      id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/privateEndpoints/second-endpoint"
+      output = { properties = { customDnsConfigs = [], networkInterfaces = [{ id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-endpoint-test/providers/Microsoft.Network/networkInterfaces/second-endpoint-nic" }] } }
     }
   }
 
