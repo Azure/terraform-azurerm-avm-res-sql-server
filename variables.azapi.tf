@@ -2,13 +2,15 @@ variable "ignore_body_changes" {
   type = object({
     authorization_locks            = optional(list(string), [])
     authorization_role_assignments = optional(list(string), [])
+    insights_diagnostic_settings   = optional(list(string), [])
   })
   default     = {}
   description = <<DESCRIPTION
 Body-relative dot-notation paths whose changes the AzAPI provider ignores. Ignored configuration is not sent to Azure until the path is removed. Non-empty values require Terraform 1.11 or later, and changes take effect only after apply.
 
-- `authorization_locks` - Ignored body paths for private endpoint locks.
-- `authorization_role_assignments` - Ignored body paths for private endpoint role assignments.
+- `authorization_locks` - Ignored body paths for management locks.
+- `authorization_role_assignments` - Ignored body paths for role assignments.
+- `insights_diagnostic_settings` - Ignored body paths for diagnostic settings.
 DESCRIPTION
   nullable    = false
 }
@@ -17,13 +19,15 @@ variable "resource_types" {
   type = object({
     authorization_locks            = optional(string, "Microsoft.Authorization/locks@2020-05-01")
     authorization_role_assignments = optional(string, "Microsoft.Authorization/roleAssignments@2022-04-01")
+    insights_diagnostic_settings   = optional(string, "Microsoft.Insights/diagnosticSettings@2021-05-01-preview")
   })
   default     = {}
   description = <<DESCRIPTION
 AzAPI resource types and API versions used by the module.
 
-- `authorization_locks` - Private endpoint management locks.
-- `authorization_role_assignments` - Private endpoint role assignments.
+- `authorization_locks` - Management locks.
+- `authorization_role_assignments` - Role assignments.
+- `insights_diagnostic_settings` - Diagnostic settings.
 DESCRIPTION
   nullable    = false
 }
